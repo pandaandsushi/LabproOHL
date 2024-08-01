@@ -19,7 +19,7 @@ model User {
   email     String   @unique
   password  String
   balance   Int      @default(0)
-  films     Film[]
+  films     FilmUser[]
 }
 
 model Film {
@@ -28,13 +28,22 @@ model Film {
   description String
   director    String
   releaseYear Int
-  genre       String[]
+  genre       String
   price       Float
   duration    Int
   coverImage  String?
   video       String?
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  users       FilmUser[]
+}
+
+model FilmUser {
+  id     Int   @id @default(autoincrement())
+  userId Int
+  filmId Int
+  user   User  @relation(fields: [userId], references: [id])
+  film   Film  @relation(fields: [filmId], references: [id])
+
+  @@unique([userId, filmId])
 }
