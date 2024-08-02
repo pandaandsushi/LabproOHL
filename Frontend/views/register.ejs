@@ -3,11 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Register</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/register.css">
 </head>
 <body>
-    <h1>Welcome to My List</h1>
-    <p>This is the register page.</p>
+    <div class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">Register</h1>
+            <form id="register-form">
+                <div class="form-group-inline">
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input id="username" name="username" required>
+                    </div>
+                </div>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="first-name">First Name:</label>
+                        <input id="first-name" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">Last Name:</label>
+                        <input id="last-name" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Register</button>
+                <div class="links">
+                    <a class="loginlink" href="/login">Already have an account?</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

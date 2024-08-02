@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
   }
   
   /* Style the header */
@@ -67,15 +66,20 @@ body {
   
   .navigation_content a:hover {
     background-color: #555;
+    text-decoration: underline;
   }
   
-  .logout_container {
+  .login_container {
     display: flex;
     align-items: center;
   }
   
-  .logout_button {
+  .login_button {
     color: white;
+    font-family: "Quicksand";
+    font-style: normal;
+    font-weight: 400;
+    font-weight: bolder;
     background-color: #f44336; 
     text-decoration: none;
     padding: 10px 15px;
@@ -83,11 +87,11 @@ body {
     transition: background-color 0.3s;
   }
   
-  .logout_button:hover {
+  .login_button:hover {
     background-color: #a01919; 
   }
 
-  .logout_button:active {
+  .login_button:active {
     transform: translateY(2px);
   }
   
@@ -99,7 +103,7 @@ body {
     .navigation_content {
       margin-bottom: 10px;
     }
-    .logout_container {
+    .login_container {
       margin-top: 10px;
     }
   }
