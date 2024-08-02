@@ -1,11 +1,18 @@
+<link rel="stylesheet" href="/navbar.css">
 <header>
-    <h1><%= title %></h1>
-    <nav>
-      <ul>
-        <li><a href="/">Hoasme</a></li>
-        <li><a href="/mylist">MyList</a></li>
-        <li><a href="/contact">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
-  
+    <a href="/browse">
+        <img src="/img/NELFLIX_WHT.svg" alt="Logo" class="navigation_logo">
+    </a>
+    <div class="navigation_container">
+      <nav class="navigation_bar">
+        <ul class="navigation_list">
+          <li class="navigation_content"><a href="/browse">Browse</a></li>
+          <li class="navigation_content"><a href="/mylist">My Films</a></li> 
+          <li class="navigation_content"><a href="/wishlist">Wishlist</a></li> 
+        </ul>
+      </nav>
+      <div class="logout_container">
+        <a href="/login" class="logout_button">Logout</a>
+      </div>
+    </div>
+</header>

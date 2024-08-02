@@ -5,10 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nelflix</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
 <body>
-  <%- include('partials/navbar', { title: 'Welcome to My Website' }) %>
-
-  <h1 class="Title">Welcome to <%= title %></h1>
+  <%- include('partials/navbar') %>
+  <div class="index_openingtext">
+    <h1 class="index_title">Ventures the world of movies right here, right now.</h1>
+    <button class="index_buttonletsgo">Start now</button>
+  </div>
+  <div class="index_howtouse">
+    <!-- Add content here if needed -->
+  </div>
+  <div class="index_faq">
+    <h1 class="faq-title">Frequently Asked Questions (FAQ)</h1>
+    <% faqData.forEach(function(faq, index) { %>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ('<%= index %>')">
+          <%= faq.question %>
+        </div>
+        <div class="faq-answer" id="faq-answer-<%= index %>">
+          <%- faq.answer %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+  <script>
+    function toggleFAQ(index) {
+      var answers = document.querySelectorAll('.faq-answer');
+      answers.forEach(function(answer, i) {
+        if (i == index) {
+          answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+        } else {
+          answer.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
