@@ -15,13 +15,15 @@ The PrismaSingleton class ensures that only one instance of the Prisma client is
 ## Endpoints
 
 ## Bonuses
-
+- FAQ Section :>
+- Responsiveness
+- Wishlist
 
 ## Tools and Libraries
 - Express.js
 - Node.js
 - MySQL
-- 
+- Prisma
 
 ## Requirements
 - Have npm installed with `npm install`
@@ -31,6 +33,4 @@ The PrismaSingleton class ensures that only one instance of the Prisma client is
 
 
 ## How to Use
-- Input the start node and end node with words as the Wikipedia title page
-- Choose between using BFS or IDS algorithm
-- Please be patient and the result will be displayed below as a graph
+- 
