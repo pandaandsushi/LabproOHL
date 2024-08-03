@@ -9,9 +9,17 @@ body {
     margin: 0;
 }
 
+.register-error-message {
+    color: rgb(255, 140, 140);
+    font-family: "Quicksand";
+    font-size: 12px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
 .form-group input, .form-group-inline .form-group input {
     width: 100%;
-    height: 30px; /* Set a maximum width */
+    height: 30px; 
     box-sizing: border-box;
     font-family: "Quicksand";
 }
