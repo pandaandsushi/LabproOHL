@@ -1,9 +1,10 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const path = window.location.pathname;
-    const navList = document.getElementById("nav-list");
-    if (path === "/") {
-        navList.style.display = "none";
-    } else {
-        navList.style.display = "flex";
+document.addEventListener('DOMContentLoaded', function () {
+    const loginContainer = document.querySelector('.login_container');
+
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username'); 
+
+    if (token && username) {
+        loginContainer.innerHTML = `<span class="welcome_message">Welcome! ${username}!</span>`;
     }
 });

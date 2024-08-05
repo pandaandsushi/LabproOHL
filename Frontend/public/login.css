@@ -9,6 +9,14 @@ body {
     margin: 0;
 }
 
+.login-error-message {
+    color: rgb(255, 140, 140);
+    font-family: "Quicksand";
+    font-size: 12px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
 .login-title {
     font-family: "Paytone One";
 }
