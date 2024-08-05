@@ -25,7 +25,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
     const result = await response.json();
     if (response.ok) {
         alert('User registered successfully!');
-        window.location.href = '/login';
+        window.location.href = '/browse';
     } else {
         alert('Error: ' + result.error);
     }
