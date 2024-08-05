@@ -1,0 +1,18 @@
+.film-card {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+}
+
+.film-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.film-card h3 {
+    margin: 10px 0;
+    font-size: 18px;
+}

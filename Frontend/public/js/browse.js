@@ -7,10 +7,10 @@ let currentPage = 1;
 const filmsPerPage = 6;
 let latestFilmTimestamp = 0;
 
-function loadFilms(searchQuery = '', page = 1) {
-    const allFilms = getFilms(); 
+async function loadFilms(searchQuery = '', page = 1) {
+    const allFilms = await fetchFilms();
     const filteredFilms = allFilms.filter(film => 
-        film.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        film.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         film.director.toLowerCase().includes(searchQuery.toLowerCase())
     );
     const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
@@ -20,6 +20,17 @@ function loadFilms(searchQuery = '', page = 1) {
     displayPagination(totalPages, page);
 }
 
+async function fetchFilms() {
+    try {
+        const response = await fetch('http://localhost:3001/api/films');
+        const films = await response.json();
+        return films;
+    } catch (error) {
+        console.error('Failed to fetch films', error);
+        return [];
+    }
+}
+
 function displayFilms(films) {
     const filmsContainer = document.getElementById('films-container');
     filmsContainer.innerHTML = '';
@@ -27,8 +38,8 @@ function displayFilms(films) {
         const filmCard = document.createElement('div');
         filmCard.classList.add('film-card');
         filmCard.innerHTML = `
-            <img src="${film.image}" alt="${film.name}">
-            <h3>${film.name}</h3>
+            <img src="${film.coverImage}" alt="${film.title}">
+            <h3>${film.title}</h3>
             <p>Director: ${film.director}</p>
         `;
         filmsContainer.appendChild(filmCard);
@@ -51,7 +62,6 @@ function displayPagination(totalPages, currentPage) {
 
 function searchFilms() {
     const searchQuery = document.getElementById('search-box').value;
-    // console.log('mencari: '+searchQuery);
     loadFilms(searchQuery, 1);
 }
 
@@ -65,7 +75,6 @@ function longPoll() {
         .then(data => {
             if (data.newFilms.length > 0) {
                 latestFilmTimestamp = data.newFilms[data.newFilms.length - 1].timestamp; // Update the latest timestamp
-                console.log('Films diload ulg');
                 loadFilms();
             }
             longPoll(); 
@@ -74,18 +83,4 @@ function longPoll() {
             console.error('Error in polling hv to reset:', error);
             setTimeout(longPoll, 5000);
         });
-}
-
-function getFilms() {
-    return [
-        { name: 'Dummy 1', director: 'Director 1', image: 'img/Dummy1.jpg' },
-        { name: 'Dummy 2', director: 'Director 2', image: 'img/Dummy2.jpg' },
-        { name: 'Dummy 3', director: 'Director 3', image: 'img/Dummy3.jpg' },
-        { name: 'Dummy 4', director: 'Director 4', image: 'img/Dummy4.jpg' },
-        { name: 'Dummy 5', director: 'Director 5', image: 'img/Dummy5.jpg' },
-        { name: 'Dummy 6', director: 'Director 6', image: 'img/Dummy6.jpg' },
-        { name: 'Dummy 7', director: 'Director 7', image: 'img/Dummy7.jpg' },
-        { name: 'Dummy 8', director: 'Director 8', image: 'img/Dummy8.jpg' },
-        { name: 'Dummy 9', director: 'Director 9', image: 'img/Dummy9.jpg' },
-    ];
 }

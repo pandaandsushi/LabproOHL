@@ -7,7 +7,9 @@ const app = express();
 const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 const secretKey = 'your_secret_key';
-
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -85,6 +87,17 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.get('/api/films', async (req, res) => {
+    try {
+        // console.error("MASUK SINI");
+        const films = await prisma.$queryRaw`SELECT * FROM film`; 
+        res.json(films);
+    } catch (error) {
+        // console.error("NGEROR", error); 
+        res.status(500).json({ error: 'Failed to fetch films' });
+    }
+  });
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
