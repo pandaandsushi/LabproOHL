@@ -99,6 +99,26 @@ app.get('/api/films', async (req, res) => {
     }
   });
 
+
+app.get('/api/films/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log({id})
+    try {
+        const film = await prisma.$queryRaw`SELECT * FROM film WHERE id = ${Number(id)}`;
+        if (!film) {
+            return res.status(404).json({ error: 'Film not found' });
+        }
+        console.log(film)
+        console.log("MASUK KE SEBUAHFILM")
+        
+        res.json(film);
+    } catch (error) {
+        console.error('Error fetching film details:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

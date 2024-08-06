@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/filmdetails.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <h1 class="filmdetails-title">Film Details</h1>
+    <div id="film-details-container">
+        <div id="film-details-content">
+            <h1 id="film-title" class="film-title">Film Details</h1>
+            <img id="film-cover-image" src="" alt="Film Cover Image" style="display: none;"/>
+            <p id="film-description"></p>
+            <p id="film-director"></p>
+            <p id="film-release-year"></p>
+            <p id="film-genre"></p>
+            <p id="film-price"></p>
+            <p id="film-duration"></p>
+            <button id="purchase-button">Purchase</button>
+        </div>
+    </div>
+    <script>
+        const filmId = <%- id %>;
+        console.log('Film ID:', <%- id%>);
+    </script>
+    <script src="/js/filmdetails.js"></script>
+</body>
+</html>

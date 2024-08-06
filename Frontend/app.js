@@ -73,6 +73,18 @@ app.get('/api/get-latest-films', (req, res) => {
   res.json({ newFilms });
 })
 
+app.get('/filmdetails/:id', async (req, res) => {
+  const { id } = req.params;
+  // console.log({id})
+  try {
+      // console.log("MASUK KE SEBUAHFILM DI APP")
+      res.render('filmdetails', { title: 'Film Details',id});
+  } catch (error) {
+      console.error('Error fetching film details:', error);
+      res.status(500).render('error', { message: 'Internal server error' });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

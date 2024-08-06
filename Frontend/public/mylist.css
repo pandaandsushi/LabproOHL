@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1E1E1E;
+    color: #FFF;
+}
+.mylist-title {
+    font-family: "Paytone One";
+    padding-left: 100px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.mylist-searchbar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#search-box {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.mylist-button {
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.mylist-button:hover {
+    background-color: #a01919;
+}
+
+.films-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.film-card {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+}
+
+.film-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.film-card h3 {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background-color: #777;
+}

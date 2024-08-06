@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>Wishlist</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/wishlist.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
-    <h1>Welcome to My List</h1>
-    <p>This is the wishlist page.</p>
+    <div class="wishlist">
+        <h1 class="wishlist-title">Wishlist</h1>
+        <div class="wishlist-searchbar">
+            <input type="text" id="search-box" placeholder="Search films by name or director...">
+            <button class="wishlist-button" onclick="searchFilms()">Search</button>
+        </div>
+        <div class="films-container" id="films-container">
+            <!-- Cards of films -->
+        </div>
+        <div class="pagination" id="pagination">
+            <!-- Pagi -->
+        </div>
+    </div>
+    <script src="/js/wishlist.js"></script>
 </body>
 </html>

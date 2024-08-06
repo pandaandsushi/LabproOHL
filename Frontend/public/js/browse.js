@@ -59,16 +59,20 @@ class FilmUI {
     }
 
     displayFilms(films) {
-        this.container.innerHTML = '';
+        const filmsContainer = document.getElementById('films-container');
+        filmsContainer.innerHTML = '';
         films.forEach(film => {
             const filmCard = document.createElement('div');
             filmCard.classList.add('film-card');
             filmCard.innerHTML = `
                 <img src="${film.coverImage}" alt="${film.title}">
-                <h3>${film.title}</h3>
+                <h3 style="font-size: 2em; color: #FFFFFF; ">${film.title}</h3>
                 <p>Director: ${film.director}</p>
             `;
-            this.container.appendChild(filmCard);
+            filmCard.onclick = () => {
+                window.location.href = `/filmdetails/${film.id}`;
+            };
+            filmsContainer.appendChild(filmCard);
         });
     }
 

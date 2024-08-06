@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>Mylist</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/mylist.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
-    <h1>Welcome to My List</h1>
-    <p>This is the mylist page.</p>
+    <div class="mylist">
+        <h1 class="mylist-title">My Films</h1>
+        <div class="mylist-searchbar">
+            <input type="text" id="search-box" placeholder="Search films by name or director...">
+            <button class="mylist-button" onclick="searchFilms()">Search</button>
+        </div>
+        <div class="films-container" id="films-container">
+            <!-- Cards of films -->
+        </div>
+        <div class="pagination" id="pagination">
+            <!-- Pagi -->
+        </div>
+    </div>
+    <script src="/js/mylist.js"></script>
 </body>
 </html>

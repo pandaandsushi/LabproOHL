@@ -1,0 +1,46 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1E1E1E;
+    color: #FFF;
+}
+.filmdetails-title {
+    font-family: "Paytone One";
+    padding-left: 100px;
+}
+
+.film-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.film-title {
+    font-size: 2em;
+    color: #333;
+}
+
+.film-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.film-description {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.film-info {
+    font-size: 1.1em;
+    color: #777;
+}
+
+.purchase-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
