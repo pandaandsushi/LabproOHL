@@ -19,9 +19,93 @@ body {
     font-weight: bolder;
     text-decoration: none;
     padding: 10px 15px;
+    padding-bottom: 0;
     border-radius: 4px;
     transition: background-color 0.3s;
   }
+  .welcome_container {
+    display: flex;
+    align-items: center;
+  }
+
+  .welcome_text {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+  }
+
+  .welcome_message {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .username {
+    font-size: 14px; 
+    color: #ffffff;
+    font-family: "Quicksand";
+    text-align: right;
+    padding-right: 16px;
+  }
+
+  .profile_icon {
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+
+
+  .profile_menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #626262;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+}
+
+.profile_menu.show {
+    display: block;
+    background-color: #333;
+    margin-right: 40px;
+    margin-top: 30px;
+    border-radius: 4px;
+}
+
+.profile_menu a,
+.profile_menu button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: right;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    text-decoration: none;
+    color: white;
+    font-family: "Quicksand";
+    font-style: normal;
+    font-weight: 400;
+    font-weight: bolder;
+    text-decoration: none;
+}
+
+.profile_menu button:hover,
+.profile_menu a:hover {
+  border-radius: 4px;
+    background-color: #626262;
+}
+
+.logout-button {
+  margin-left: 0px;
+  color: white;
+}
+
 
   .navigation_logo {
     height: 40px;

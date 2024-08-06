@@ -28,7 +28,7 @@ body {
     border-radius: 4px;
 }
 
-button {
+.browse-button {
     padding: 10px 20px;
     background-color: #f44336;
     color: white;
@@ -38,7 +38,7 @@ button {
     margin-left: 10px;
 }
 
-button:hover {
+.browse-button:hover {
     background-color: #a01919;
 }
 
