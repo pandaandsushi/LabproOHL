@@ -52,20 +52,32 @@ body {
 .film-card {
     background-color: #333;
     border-radius: 8px;
-    padding: 20px;
+    padding: 30px;
     width: 200px;
     text-align: center;
+    font-size: 15px;
+    margin: 0;
+    font-family: "Poppins";
+}
+
+.film-card:hover{
+    transform: translateY(-2px);
+    background-color: #555;
 }
 
 .film-card img {
-    width: 100%;
-    height: auto;
+    max-width: 200px;
+    min-width: 200px;
+    max-height: 300px;
+    min-height: 300px;
     border-radius: 4px;
 }
 
 .film-card h3 {
-    margin: 10px 0;
-    font-size: 18px;
+    font-size: 25px;
+    padding: 0;
+    margin: 0;
+    font-family: "Quicksand";
 }
 
 .pagination {
