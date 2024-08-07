@@ -4,9 +4,21 @@ body {
     background-color: #1E1E1E;
     color: #FFF;
 }
-.filmdetails-title {
-    font-family: "Paytone One";
-    padding-left: 100px;
+.film-details-container {
+    display: flex;
+    flex-direction: row;
+    padding-left: 30px;
+}
+
+.film-details-content {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+}
+
+.film-details-outer-div {
+    display: flex;
+    flex-direction: row;
 }
 
 .film-container {
@@ -15,19 +27,46 @@ body {
 }
 
 .film-title {
-    font-size: 2em;
-    color: #333;
+    margin: 0;
+    padding-top: 20px;
+    font-family: "Paytone One";
+    padding-left: 10px;
 }
 
-.film-image {
-    max-width: 100%;
-    height: auto;
+.film-details-backbutton {
+    color: white;
+    height: fit-content;
+    width: fit-content;
+    font-family: "Quicksand";
+    font-style: normal;
+    font-weight: 400;
+    font-weight: bolder;
+    background-color: #f44336; 
+    text-decoration: none;
+    border: 0;
+    margin-left: 50px;
+    margin-top: 25px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.film-details-backbutton:hover {
+    background-color: #a01919; 
+}
+
+.film-details-backbutton:active {
+    transform: translateY(2px);
+}
+
+.film-cover-image {
+    max-width: 300px;
+    min-width: 300px;
+    max-height: 380px;
+    min-height: 380px;
     border-radius: 8px;
-}
-
-.film-description {
-    font-size: 1.2em;
-    color: #666;
+    padding: 20px;
 }
 
 .film-info {
@@ -36,11 +75,43 @@ body {
 }
 
 .purchase-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
+    color: white;
+    width: fit-content;
+    font-family: "Quicksand";
+    font-style: normal;
+    font-weight: 400;
+    font-weight: bolder;
+    background-color: #f44336; 
+    text-decoration: none;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 4px;
+    transition: background-color 0.3s;
     cursor: pointer;
+    margin-top: 10px;
+}
+
+.purchase-button:hover {
+    background-color: #a01919; 
+}
+
+.purchase-button:active {
+    transform: translateY(2px);
+}
+
+.film-points {
+    margin: 5px;
+    font-size: 20px;
+    font-family: "Quicksand";
+}
+
+.film-description {
+    padding-top: 10px;
+    font-weight: bold;
+    margin: 5px;
+    font-size: 20px;
+    font-family: "Quicksand";
+    color: white;
+    width: 90%;
+    text-align: justify;
 }

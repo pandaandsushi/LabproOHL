@@ -40,9 +40,10 @@ class FilmDetailsUI {
         document.getElementById('film-duration').textContent = `Duration: ${film[0].duration} minutes`;
 
         // DEBUG BELOM BISA MALAH NGEFETCH
-        const coverImageElement = document.getElementById('film-cover-image');
-        coverImageElement.src = film[0].coverImage;
-        coverImageElement.style.display = 'block';
+        // const coverImageElement = document.getElementById('film-cover-image');
+        // coverImageElement.src = film[0].coverImage;
+        // console.log(film[0].coverImage);
+        // coverImageElement.style.display = 'block';
 
         const purchaseButton = document.getElementById('purchase-button');
         purchaseButton.addEventListener('click', () => {
