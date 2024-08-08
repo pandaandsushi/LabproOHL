@@ -79,14 +79,23 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid email/username or password' });
         }
 
-        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
-
-        res.json({ token, isAdmin: user.isAdmin, username: user.username });
+        const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, secretKey, { expiresIn: '1h' });
+        console.log(user.balance)
+        // console.log("AJBDKAJB")
+        res.json({
+            token,
+            isAdmin: user.isAdmin,
+            username: user.username,
+            email: user.email,
+            balance: user.balance,
+            films: user.films
+        });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 app.get('/api/films', async (req, res) => {
     try {
@@ -98,7 +107,15 @@ app.get('/api/films', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch films' });
     }
   });
-
+  
+app.get('/api/users', async (req, res) => {
+    try {
+        const films = await prisma.$queryRaw`SELECT * FROM users`; 
+        res.json(films);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch films' });
+    }
+  });
 
 app.get('/api/films/:id', async (req, res) => {
     const { id } = req.params;
@@ -118,6 +135,16 @@ app.get('/api/films/:id', async (req, res) => {
     }
 });
 
+app.get('/api/users/:id', async (req, res) => {
+    const { username } = req.params;
+    console.log({username})
+    try {
+        const user = await prisma.$queryRaw`SELECT * FROM user WHERE id = ${Number(id)}`;
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+});
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

@@ -27,6 +27,7 @@ class AuthService {
             });
 
             const result = await response.json();
+            console.log(result)
             if (response.ok) {
                 return result;
             } else {
@@ -53,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('isAdmin', result.isAdmin);
                 localStorage.setItem('username', result.username);
+                localStorage.setItem('email', result.email);
+                localStorage.setItem('balance', result.balance);
+                localStorage.setItem('films', result.films);
                 alert('User logged in successfully!');
                 if (result.isAdmin) {
                     window.location.href = '/films';
@@ -88,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('isAdmin', result.isAdmin);
                 localStorage.setItem('username', result.username);
+                localStorage.setItem('email', result.email);
+                localStorage.setItem('balance', result.balance);
+                localStorage.setItem('films', result.films);
                 alert('User registered and logged in successfully!');
                 window.location.href = '/browse';
             } catch (error) {

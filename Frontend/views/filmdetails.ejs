@@ -10,7 +10,7 @@
 <body>
     <%- include('partials/navbar') %>
     <div class="film-details-outer-div">
-        <button class="film-details-backbutton">< Go Back</button>
+        <button onclick="history.back()" class="film-details-backbutton">< Go Back</button>
         <h1 id="film-title" class="film-title"></h1>
     </div>
         <div class="film-details-container" id="film-details-container">
@@ -22,7 +22,10 @@
                 <p id="film-genre" class="film-points"></p>
                 <p id="film-price" class="film-points"></p>
                 <p id="film-duration" class="film-points"></p>
-                <button id="purchase-button" class="purchase-button">Purchase</button>
+                <div class="film-details-buttons">
+                    <button id="purchase-button" class="purchase-button">Purchase</button>
+                    <button id="wishlist-button" class="purchase-button">Add to Wishlist +</button>
+                </div>
             </div>
     </div>
     <script>

@@ -85,6 +85,7 @@ body {
     text-decoration: none;
     padding: 10px 15px;
     border: 0;
+    margin-right: 10px;
     border-radius: 4px;
     transition: background-color 0.3s;
     cursor: pointer;
@@ -114,4 +115,77 @@ body {
     color: white;
     width: 90%;
     text-align: justify;
+}
+
+.film-details-buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+@media (max-width: 768px) {
+    .film-details-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .film-cover-image {
+        max-width: 80%;
+        padding: 10px;
+    }
+
+    .film-details-content {
+        margin: 20px;
+        max-width: 90%;
+    }
+
+    .film-title {
+        font-size: 1.5em;
+        text-align: center;
+    }
+
+    .film-details-backbutton {
+        margin: 10px 0;
+    }
+
+    .film-description {
+        width: 100%;
+    }
+
+    .film-points {
+        font-size: 18px;
+    }
+
+    .purchase-button {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .film-details-outer-div {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .film-details-content {
+        margin: 10px;
+    }
+
+    .film-title {
+        font-size: 1.2em;
+    }
+
+    .film-cover-image {
+        max-width: 100%;
+        padding: 5px;
+    }
+
+    .film-points {
+        font-size: 16px;
+    }
+
+    .purchase-button {
+        font-size: 16px;
+    }
 }

@@ -3,13 +3,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username'); 
+    const balance = localStorage.getItem('balance'); 
+    const films = localStorage.getItem('films'); 
 
+    console.log(balance)
     if (token && username) {
         loginContainer.innerHTML = `
             <div class="welcome_container">
                 <div class="welcome_text">
-                    <span class="welcome_message">Welcome!</span>
-                    <span class="username">${username}</span>
+                    <span class="welcome_message">${username}</span>
+                    <span class="username">${balance} $</span>
                 </div>
                 <img src="/img/PROFILE_ICON.png" alt="Profile Icon" class="profile_icon" id="profile-icon">
                 <div class="profile_menu" id="profile-menu">
