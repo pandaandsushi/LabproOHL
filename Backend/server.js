@@ -142,10 +142,10 @@ app.get('/api/films/:id', async (req, res) => {
         `;
 
         const isPurchased = purchaseCheck.length > 0;
-        console.log("NGECEK ISPURCHASED DI SERVER")
-        console.log(isPurchased)
-        console.log(userId)
-        console.log(id)
+        // console.log("NGECEK ISPURCHASED DI SERVER")
+        // console.log(isPurchased)
+        // console.log(userId)
+        // console.log(id)
         res.json({ ...film[0], isPurchased });
     } catch (error) {
         console.error('Error fetching film details:', error);
@@ -227,6 +227,38 @@ app.post('/api/purchase', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+app.post('/api/wishlist', async (req, res) => {
+    const { filmId } = req.body;
+    const userId = req.body.userId;
+
+    try {
+        const wishlistCheck = await prisma.$queryRaw`
+            SELECT 1
+            FROM Wishlist
+            WHERE userId = ${Number(userId)} AND filmId = ${Number(filmId)}
+        `;
+        
+        if (wishlistCheck.length > 0) {
+            await prisma.$executeRaw`
+                DELETE FROM Wishlist
+                WHERE userId = ${Number(userId)} AND filmId = ${Number(filmId)}
+            `;
+            return res.status(200).json({ message: 'Removed from Wishlist', isWishlisted: false });
+        } else {
+            // Film is not in the wishlist, add it
+            await prisma.$executeRaw`
+                INSERT INTO Wishlist (userId, filmId)
+                VALUES (${Number(userId)}, ${Number(filmId)})
+            `;
+            return res.status(200).json({ message: 'Added to Wishlist', isWishlisted: true });
+        }
+    } catch (error) {
+        console.error('Error processing wishlist:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

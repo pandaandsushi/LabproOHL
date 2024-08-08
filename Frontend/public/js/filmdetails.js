@@ -42,17 +42,25 @@ class FilmDetailsUI {
     }
 
     setupButton(film) {
-        const button = document.getElementById('purchase-button');
-        console.log("ngecek ispurchased di js")
-        console.log(film.isPurchased)
+        const purchaseButton = document.getElementById('purchase-button');
+        const wishlistButton = document.getElementById('wishlist-button');
+        
+        console.log('Setting up buttons, isWishlisted:', film.isWishlisted);
+    
+        // cek undefined supaya ga revert ke add state saat reload dan set ke local memory untuk fallback
+        if (film.isWishlisted === undefined) {
+            const storedWishlistState = localStorage.getItem(`film_${film.id}_wishlist`);
+            film.isWishlisted = storedWishlistState === 'true'; 
+        }
+    
         if (film.isPurchased) {
-            button.textContent = 'Watch';
-            button.onclick = () => {
+            purchaseButton.textContent = 'Watch';
+            purchaseButton.onclick = () => {
                 alert('Watching the film!');
             };
         } else {
-            button.textContent = 'Purchase';
-            button.onclick = async () => {
+            purchaseButton.textContent = 'Purchase';
+            purchaseButton.onclick = async () => {
                 const balance = Number(localStorage.getItem('balance'));
                 try {
                     const response = await fetch('http://localhost:3001/api/purchase', {
@@ -65,12 +73,12 @@ class FilmDetailsUI {
                             filmId: film.id,
                         }),
                     });
-
+    
                     const result = await response.json();
                     if (response.ok) {
                         alert('Purchase successful!');
                         localStorage.setItem('balance', balance - film.price);
-                        this.setupButton({ ...film, isPurchased: true }); // Update button to "Watch" after purchase
+                        this.setupButton({ ...film, isPurchased: true });
                     } else {
                         alert(result.message);
                     }
@@ -80,11 +88,70 @@ class FilmDetailsUI {
                 }
             };
         }
-    }
+    
+        if (film.isWishlisted) {
+            wishlistButton.textContent = 'Add to Wishlist';
+            wishlistButton.onclick = async () => {
+                try {
+                    const response = await fetch('http://localhost:3001/api/wishlist', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId: localStorage.getItem('id'),
+                            filmId: film.id,
+                        }),
+                    });
+    
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Removed from Wishlist');
+                        localStorage.setItem(`film_${film.id}_wishlist`, false);
+                        this.setupButton({ ...film, isWishlisted: false });
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error during wishlist removal:', error);
+                    alert('Failed to remove from wishlist');
+                }
+            };
+        } else {
+            wishlistButton.textContent = 'Remove from Wishlist';
+            wishlistButton.onclick = async () => {
+                try {
+                    const response = await fetch('http://localhost:3001/api/wishlist', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId: localStorage.getItem('id'),
+                            filmId: film.id,
+                        }),
+                    });
+    
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Added to Wishlist');
+                        localStorage.setItem(`film_${film.id}_wishlist`, true);
+                        this.setupButton({ ...film, isWishlisted: true });
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error during wishlist addition:', error);
+                    alert('Failed to add to wishlist');
+                }
+            };
+        }
+    }    
+    
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const userId = localStorage.getItem('id'); // Retrieve the user ID from local storage
+    const userId = localStorage.getItem('id'); 
     const filmService = new FilmDetailsService(`http://localhost:3001/api/films/`);
     const filmDetailsUI = new FilmDetailsUI('film-details-container');
 
