@@ -165,7 +165,7 @@ app.get('/api/users/:id', async (req, res) => {
     }
 });
 
-app.post('/api/purchase', async (req, res) => {
+app.post('/api/purchasestatus', async (req, res) => {
     const { userId, filmId } = req.body;
     try {
         // cek udh beli
@@ -228,7 +228,45 @@ app.post('/api/purchase', async (req, res) => {
     }
 });
 
-app.post('/api/wishlist', async (req, res) => {
+app.get('/api/purchase', async (req, res) => {
+    const { userId } = req.query;
+
+    try {
+        const purchasedFilms = await prisma.$queryRaw`
+            SELECT f.*
+            FROM Film f
+            INNER JOIN FilmUser fu ON f.id = fu.filmId
+            WHERE fu.userId = ${Number(userId)}
+        `;
+
+        res.json(purchasedFilms);
+    } catch (error) {
+        console.error('Failed to fetch purchased films:', error);
+        res.status(500).json({ error: 'Failed to fetch purchased films' });
+    }
+});
+
+
+app.get('/api/wishlist', async (req, res) => {
+    const { userId } = req.query;
+
+    try {
+        const wishlistFilms = await prisma.$queryRaw`
+            SELECT f.*
+            FROM Film f
+            INNER JOIN Wishlist w ON f.id = w.filmId
+            WHERE w.userId = ${Number(userId)}
+        `;
+
+        res.json(wishlistFilms);
+    } catch (error) {
+        console.error('Failed to fetch wishlist films:', error);
+        res.status(500).json({ error: 'Failed to fetch wishlist films' });
+    }
+});
+
+
+app.post('/api/wishliststatus', async (req, res) => {
     const { filmId } = req.body;
     const userId = req.body.userId;
 

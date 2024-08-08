@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/wishlist.css">
+    <link rel="stylesheet" href="/browse.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
-    <div class="wishlist">
-        <h1 class="wishlist-title">Wishlist</h1>
-        <div class="wishlist-searchbar">
+    <div class="browse">
+        <h1 class="browse-title">Wishlist</h1>
+        <div class="browse-searchbar">
             <input type="text" id="search-box" placeholder="Search films by name or director...">
-            <button class="wishlist-button" onclick="searchFilms()">Search</button>
+            <button class="browse-button" onclick="searchFilms()">Search</button>
         </div>
         <div class="films-container" id="films-container">
             <!-- Cards of films -->
@@ -22,6 +22,6 @@
             <!-- Pagi -->
         </div>
     </div>
-    <script src="/js/wishlist.js"></script>
+    <script src="/js/browse.js"></script>
 </body>
 </html>

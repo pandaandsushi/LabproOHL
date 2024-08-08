@@ -15,9 +15,23 @@ class Film {
     }
 }
 
-class FilmService {
-    constructor(apiUrl) {
-        this.apiUrl = apiUrl;
+class FilmFetchingStrategy {
+    async fetchFilms() {
+        throw new Error("fetchFilms method should be implemented");
+    }
+
+    filterFilms(films, searchQuery) {
+        return films.filter(film =>
+            film.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            film.director.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }
+}
+
+class BrowseFilmStrategy extends FilmFetchingStrategy {
+    constructor() {
+        super();
+        this.apiUrl = 'http://localhost:3001/api/films';
     }
 
     async fetchFilms() {
@@ -43,14 +57,44 @@ class FilmService {
             return [];
         }
     }
+}
 
-    filterFilms(films, searchQuery) {
-        return films.filter(film =>
-            film.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            film.director.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+class PurchasedFilmStrategy extends FilmFetchingStrategy {
+    constructor(userId) {
+        super();
+        this.apiUrl = 'http://localhost:3001/api/purchase';
+        this.userId = userId;
+    }
+
+    async fetchFilms() {
+        try {
+            const response = await fetch(`${this.apiUrl}?userId=${this.userId}`);
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch purchased films', error);
+            return [];
+        }
     }
 }
+
+class WishlistFilmStrategy extends FilmFetchingStrategy {
+    constructor(userId) {
+        super();
+        this.apiUrl = 'http://localhost:3001/api/wishlist';
+        this.userId = userId;
+    }
+
+    async fetchFilms() {
+        try {
+            const response = await fetch(`${this.apiUrl}?userId=${this.userId}`);
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch purchased films', error);
+            return [];
+        }
+    }
+}
+
 
 class FilmUI {
     constructor(containerId, paginationId) {
@@ -118,17 +162,28 @@ class PollingService {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const filmService = new FilmService('http://localhost:3001/api/films');
     const filmUI = new FilmUI('films-container', 'pagination');
-    const pollingService = new PollingService('/api/get-latest-films', () => loadFilms());
+    const userId = localStorage.getItem('id'); // Assume the user ID is stored here
+    let filmService;
+
+    const isBrowsePage = window.location.pathname.includes('/browse');
+    const isPurchasedPage = window.location.pathname.includes('/mylist');
+    const isWishlistPage = window.location.pathname.includes('/wishlist');
+
+    if (isBrowsePage) {
+        filmService = new BrowseFilmStrategy();
+    } else if (isPurchasedPage) {
+        filmService = new PurchasedFilmStrategy(userId);
+    } else if (isWishlistPage) {
+        filmService = new WishlistFilmStrategy(userId);
+    }
 
     let currentPage = 1;
     const filmsPerPage = 6;
 
     async function loadFilms(searchQuery = '', page = 1) {
-        // console.log("YESSS");
         const allFilms = await filmService.fetchFilms();
-        const filteredFilms = filmService.filterFilms(allFilms, searchQuery);
+        const filteredFilms = filmService.filterFilms(allFilms, searchQuery); // Reuse the filter method
         const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
         const filmsToShow = filteredFilms.slice((page - 1) * filmsPerPage, page * filmsPerPage);
 
@@ -142,5 +197,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadFilms();
-    pollingService.startPolling();
 });
+

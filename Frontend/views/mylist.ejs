@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mylist</title>
+    <title>My Films</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/mylist.css">
+    <link rel="stylesheet" href="/browse.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
-    <div class="mylist">
-        <h1 class="mylist-title">My Films</h1>
-        <div class="mylist-searchbar">
+    <div class="browse">
+        <h1 class="browse-title">My Films</h1>
+        <div class="browse-searchbar">
             <input type="text" id="search-box" placeholder="Search films by name or director...">
-            <button class="mylist-button" onclick="searchFilms()">Search</button>
+            <button class="browse-button" onclick="searchFilms()">Search</button>
         </div>
         <div class="films-container" id="films-container">
             <!-- Cards of films -->
@@ -22,6 +22,6 @@
             <!-- Pagi -->
         </div>
     </div>
-    <script src="/js/mylist.js"></script>
+    <script src="/js/browse.js"></script>
 </body>
 </html>

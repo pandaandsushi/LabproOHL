@@ -63,7 +63,7 @@ class FilmDetailsUI {
             purchaseButton.onclick = async () => {
                 const balance = Number(localStorage.getItem('balance'));
                 try {
-                    const response = await fetch('http://localhost:3001/api/purchase', {
+                    const response = await fetch('http://localhost:3001/api/purchasestatus', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ class FilmDetailsUI {
             wishlistButton.textContent = 'Add to Wishlist';
             wishlistButton.onclick = async () => {
                 try {
-                    const response = await fetch('http://localhost:3001/api/wishlist', {
+                    const response = await fetch('http://localhost:3001/api/wishliststatus', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ class FilmDetailsUI {
             wishlistButton.textContent = 'Remove from Wishlist';
             wishlistButton.onclick = async () => {
                 try {
-                    const response = await fetch('http://localhost:3001/api/wishlist', {
+                    const response = await fetch('http://localhost:3001/api/wishliststatus', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
