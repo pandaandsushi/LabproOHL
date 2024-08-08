@@ -16,6 +16,18 @@ class AuthService {
         return this.login(email, password);
     }
 
+    async getAllUsers() {
+        return this._sendRequest('users', {}, 'GET');
+    }
+
+    async getUserById(id) {
+        return this._sendRequest(`users/${id}`, {}, 'GET');
+    }
+
+    async getUserFilms(id) {
+        return this._sendRequest(`users/${id}/films`, {}, 'GET');
+    }
+
     async _sendRequest(endpoint, data) {
         try {
             const response = await fetch(`${this.apiUrl}/${endpoint}`, {
@@ -51,12 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('password').value;
             try {
                 const result = await authService.login(emailOrUsername, password);
+                localStorage.setItem('id', result.id);
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('isAdmin', result.isAdmin);
                 localStorage.setItem('username', result.username);
                 localStorage.setItem('email', result.email);
                 localStorage.setItem('balance', result.balance);
-                localStorage.setItem('films', result.films);
+                // const id = localStorage.getItem('id');
+                // console.log(id);
                 alert('User logged in successfully!');
                 if (result.isAdmin) {
                     window.location.href = '/films';
@@ -89,12 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const result = await authService.registerAndLogin(email, username, firstName, lastName, password);
+                localStorage.setItem('userid', result.id);
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('isAdmin', result.isAdmin);
                 localStorage.setItem('username', result.username);
                 localStorage.setItem('email', result.email);
                 localStorage.setItem('balance', result.balance);
-                localStorage.setItem('films', result.films);
+
                 alert('User registered and logged in successfully!');
                 window.location.href = '/browse';
             } catch (error) {

@@ -47,7 +47,21 @@ class FilmDetailsUI {
 
         const purchaseButton = document.getElementById('purchase-button');
         purchaseButton.addEventListener('click', () => {
-            console.log("PURCHASE");
+            console.log("PURCHASE CLICKED");
+            const balance = localStorage.getItem('balance'); 
+            if (balance>=film[0].price){
+                localStorage.setItem('balance', result.balance- film[0].price);
+                // add to filmuser relation
+            }
+            else{
+                alert("Not enough balance");
+            }
+        });
+
+        const wishlistButton = document.getElementById('wishlist-button');
+        wishlistButton.addEventListener('click', () => {
+            console.log("WISHLIST CLICKED");
+
         });
     }
 }

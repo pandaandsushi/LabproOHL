@@ -88,7 +88,8 @@ app.post('/api/login', async (req, res) => {
             username: user.username,
             email: user.email,
             balance: user.balance,
-            films: user.films
+            films: user.films,
+            id: user.id
         });
     } catch (error) {
         console.error('Error logging in:', error);
@@ -106,7 +107,7 @@ app.get('/api/films', async (req, res) => {
         // console.error("NGEROR", error); 
         res.status(500).json({ error: 'Failed to fetch films' });
     }
-  });
+});
   
 app.get('/api/users', async (req, res) => {
     try {
@@ -115,7 +116,7 @@ app.get('/api/users', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch films' });
     }
-  });
+});
 
 app.get('/api/films/:id', async (req, res) => {
     const { id } = req.params;
@@ -145,6 +146,8 @@ app.get('/api/users/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch user data' });
     }
 });
+
+
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

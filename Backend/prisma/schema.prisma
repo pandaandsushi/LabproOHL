@@ -21,6 +21,7 @@ model User {
   balance   Int      @default(0)
   isAdmin   Boolean  @default(false)
   films     FilmUser[]
+  wishlists  Wishlist[]
 }
 
 model Film {
@@ -36,11 +37,20 @@ model Film {
   video       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  users       FilmUser[]
+  users     FilmUser[]
+  wishlists  Wishlist[]
 }
 
 model FilmUser {
-  id     Int   @id @default(autoincrement())
+  userId Int
+  filmId Int
+  user   User  @relation(fields: [userId], references: [id])
+  film   Film  @relation(fields: [filmId], references: [id])
+
+  @@unique([userId, filmId])
+}
+
+model Wishlist {
   userId Int
   filmId Int
   user   User  @relation(fields: [userId], references: [id])
