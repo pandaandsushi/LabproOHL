@@ -3,9 +3,9 @@ class FilmDetailsService {
         this.apiUrl = apiUrl;
     }
 
-    async fetchFilmDetails(id) {
+    async fetchFilmDetails(id, userId) {
         try {
-            const response = await fetch(`${this.apiUrl}${id}`);
+            const response = await fetch(`${this.apiUrl}${id}?userId=${userId}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -30,27 +30,31 @@ class FilmDetailsUI {
             return;
         }
 
-        console.log('Displaying film:', film);
-        document.getElementById('film-title').textContent = film[0].title;
-        document.getElementById('film-description').textContent = film[0].description;
-        document.getElementById('film-director').textContent = `Director: ${film[0].director}`;
-        document.getElementById('film-release-year').textContent = `Release Year: ${film[0].releaseYear}`;
-        document.getElementById('film-genre').textContent = `Genre: ${film[0].genre}`;
-        document.getElementById('film-price').textContent = `Price: $${film[0].price}`;
-        document.getElementById('film-duration').textContent = `Duration: ${film[0].duration} minutes`;
+        document.getElementById('film-title').textContent = film.title;
+        document.getElementById('film-description').textContent = film.description;
+        document.getElementById('film-director').textContent = `Director: ${film.director}`;
+        document.getElementById('film-release-year').textContent = `Release Year: ${film.releaseYear}`;
+        document.getElementById('film-genre').textContent = `Genre: ${film.genre}`;
+        document.getElementById('film-price').textContent = `Price: $${film.price}`;
+        document.getElementById('film-duration').textContent = `Duration: ${film.duration} minutes`;
 
-        // DEBUG BELOM BISA MALAH NGEFETCH
-        // const coverImageElement = document.getElementById('film-cover-image');
-        // coverImageElement.src = film[0].coverImage;
-        // console.log(film[0].coverImage);
-        // coverImageElement.style.display = 'block';
+        this.setupButton(film);
+    }
 
-        const purchaseButton = document.getElementById('purchase-button');
-        purchaseButton.addEventListener('click', async () => {
-            console.log("PURCHASE CLICKED");
-            const balance = Number(localStorage.getItem('balance'));
+    setupButton(film) {
+        const button = document.getElementById('purchase-button');
+        console.log("ngecek ispurchased di js")
+        console.log(film.isPurchased)
+        if (film.isPurchased) {
+            button.textContent = 'Watch';
+            button.onclick = () => {
+                alert('Watching the film!');
+            };
+        } else {
+            button.textContent = 'Purchase';
+            button.onclick = async () => {
+                const balance = Number(localStorage.getItem('balance'));
                 try {
-                    console.log("MULAI MASUK KE JS");
                     const response = await fetch('http://localhost:3001/api/purchase', {
                         method: 'POST',
                         headers: {
@@ -58,16 +62,15 @@ class FilmDetailsUI {
                         },
                         body: JSON.stringify({
                             userId: localStorage.getItem('id'),
-                            filmId: film[0].id,
+                            filmId: film.id,
                         }),
                     });
-                    const result = await response.json();
-                    console.log(result.message);
 
+                    const result = await response.json();
                     if (response.ok) {
                         alert('Purchase successful!');
-                        localStorage.setItem('balance', balance - film[0].price);
-                        document.getElementById('purchase-button').textContent = 'Watch';
+                        localStorage.setItem('balance', balance - film.price);
+                        this.setupButton({ ...film, isPurchased: true }); // Update button to "Watch" after purchase
                     } else {
                         alert(result.message);
                     }
@@ -75,24 +78,18 @@ class FilmDetailsUI {
                     console.error('Error during purchase:', error);
                     alert('Failed to complete purchase');
                 }
-        });
-
-        const wishlistButton = document.getElementById('wishlist-button');
-        wishlistButton.addEventListener('click', () => {
-            console.log("WISHLIST CLICKED");
-
-        });
+            };
+        }
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const filmService = new FilmDetailsService('http://localhost:3001/api/films/');
+    const userId = localStorage.getItem('id'); // Retrieve the user ID from local storage
+    const filmService = new FilmDetailsService(`http://localhost:3001/api/films/`);
     const filmDetailsUI = new FilmDetailsUI('film-details-container');
 
-    console.log('Fetching film details for ID:', filmId);
     try {
-        const desiredFilm = await filmService.fetchFilmDetails(filmId);
-        console.log('Desired film:', desiredFilm);
+        const desiredFilm = await filmService.fetchFilmDetails(filmId, userId);
         filmDetailsUI.displayFilmDetails(desiredFilm);
     } catch (error) {
         console.error('Error in fetching and displaying film details:', error);

@@ -13,24 +13,24 @@
         <button onclick="history.back()" class="film-details-backbutton">< Go Back</button>
         <h1 id="film-title" class="film-title"></h1>
     </div>
-        <div class="film-details-container" id="film-details-container">
-            <img class="film-cover-image" id="film-cover-image" src="/img/Dummy1.jpg" alt="Film Cover Image"/>
-            <div class="film-details-content" id="film-details-content">
-                <p id="film-description" class="film-description"></p>
-                <p id="film-director" class="film-points"></p>
-                <p id="film-release-year" class="film-points"></p>
-                <p id="film-genre" class="film-points"></p>
-                <p id="film-price" class="film-points"></p>
-                <p id="film-duration" class="film-points"></p>
-                <div class="film-details-buttons">
-                    <button id="purchase-button" class="purchase-button">Purchase</button>
-                    <button id="wishlist-button" class="purchase-button">Add to Wishlist +</button>
-                </div>
+    <div class="film-details-container" id="film-details-container">
+        <img class="film-cover-image" id="film-cover-image" src="/img/Dummy1.jpg" alt="Film Cover Image"/>
+        <div class="film-details-content" id="film-details-content">
+            <p id="film-description" class="film-description"></p>
+            <p id="film-director" class="film-points"></p>
+            <p id="film-release-year" class="film-points"></p>
+            <p id="film-genre" class="film-points"></p>
+            <p id="film-price" class="film-points"></p>
+            <p id="film-duration" class="film-points"></p>
+            <div class="film-details-buttons">
+                <button id="purchase-button" class="purchase-button"></button>
+                <button id="wishlist-button" class="purchase-button">Add to Wishlist +</button>
             </div>
+        </div>
     </div>
     <script>
-            const filmId = <%- id %>;
-            </script>
+        const filmId = <%- id %>;
+    </script>
     <script src="/js/filmdetails.js"></script>
 </body>
 </html>

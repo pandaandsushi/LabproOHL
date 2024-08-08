@@ -120,21 +120,39 @@ app.get('/api/users', async (req, res) => {
 
 app.get('/api/films/:id', async (req, res) => {
     const { id } = req.params;
-    console.log({id})
+    const userId = req.query.userId;
+
     try {
-        const film = await prisma.$queryRaw`SELECT * FROM film WHERE id = ${Number(id)}`;
-        if (!film) {
+        // Fetch the film details
+        const film = await prisma.$queryRaw`
+            SELECT * 
+            FROM Film 
+            WHERE id = ${Number(id)}
+        `;
+
+        if (!film.length) {
             return res.status(404).json({ error: 'Film not found' });
         }
-        console.log(film)
-        console.log("MASUK KE SEBUAHFILM")
-        
-        res.json(film);
+
+        // cek udah beli
+        const purchaseCheck = await prisma.$queryRaw`
+            SELECT 1
+            FROM FilmUser
+            WHERE userId = ${Number(userId)} AND filmId = ${Number(id)}
+        `;
+
+        const isPurchased = purchaseCheck.length > 0;
+        console.log("NGECEK ISPURCHASED DI SERVER")
+        console.log(isPurchased)
+        console.log(userId)
+        console.log(id)
+        res.json({ ...film[0], isPurchased });
     } catch (error) {
         console.error('Error fetching film details:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 app.get('/api/users/:id', async (req, res) => {
     const { username } = req.params;
