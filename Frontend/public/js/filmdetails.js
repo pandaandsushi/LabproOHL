@@ -46,16 +46,35 @@ class FilmDetailsUI {
         // coverImageElement.style.display = 'block';
 
         const purchaseButton = document.getElementById('purchase-button');
-        purchaseButton.addEventListener('click', () => {
+        purchaseButton.addEventListener('click', async () => {
             console.log("PURCHASE CLICKED");
-            const balance = localStorage.getItem('balance'); 
-            if (balance>=film[0].price){
-                localStorage.setItem('balance', result.balance- film[0].price);
-                // add to filmuser relation
-            }
-            else{
-                alert("Not enough balance");
-            }
+            const balance = Number(localStorage.getItem('balance'));
+                try {
+                    console.log("MULAI MASUK KE JS");
+                    const response = await fetch('http://localhost:3001/api/purchase', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId: localStorage.getItem('id'),
+                            filmId: film[0].id,
+                        }),
+                    });
+                    const result = await response.json();
+                    console.log(result.message);
+
+                    if (response.ok) {
+                        alert('Purchase successful!');
+                        localStorage.setItem('balance', balance - film[0].price);
+                        document.getElementById('purchase-button').textContent = 'Watch';
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error during purchase:', error);
+                    alert('Failed to complete purchase');
+                }
         });
 
         const wishlistButton = document.getElementById('wishlist-button');

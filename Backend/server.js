@@ -147,7 +147,68 @@ app.get('/api/users/:id', async (req, res) => {
     }
 });
 
+app.post('/api/purchase', async (req, res) => {
+    const { userId, filmId } = req.body;
+    try {
+        // cek udh beli
+        const existingPurchase = await prisma.$queryRaw`
+            SELECT 1
+            FROM FilmUser
+            WHERE userId = ${userId} AND filmId = ${filmId}
+        `;
+        if (existingPurchase.length) {
+            console.log("ALR PURCHASED!")
+            return res.status(400).json({ message: 'Film already purchased' });//tes fallback
+        }
+        else{
+            console.log("NOT YET PURCHASED!")
+        }
+        
+        const [user, film] = await Promise.all([
+            prisma.$queryRaw`
+                SELECT * 
+                FROM User
+                WHERE id = ${userId}
+            `,
+            prisma.$queryRaw`
+                SELECT * 
+                FROM Film
+                WHERE id = ${filmId}
+            `
+        ]);
+        if (!user.length || !film.length) {
+            return res.status(404).json({ message: 'User or film not found' });
+        }
 
+        const userRecord = user[0];
+        const filmRecord = film[0];
+
+        // cek duid cukup
+        if (userRecord.balance < filmRecord.price) {
+            return res.status(400).json({ message: 'Not enough balance' });
+        }
+        else{
+            console.log('Balance enough')
+        }
+
+        await prisma.$executeRaw`
+            INSERT INTO FilmUser (userId, filmId)
+            VALUES (${userId}, ${filmId})
+        `;
+        // console.log("BERHASIL CREATE RECORD")
+
+        await prisma.$executeRaw`
+            UPDATE User
+            SET balance = balance - ${filmRecord.price}
+            WHERE id = ${userId}
+        `;
+        // console.log("BERHASIL KURANGIN DUID")
+        res.status(200).json({ message: 'Purchase successful' });
+    } catch (error) {
+        console.error('Error processing purchase:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
