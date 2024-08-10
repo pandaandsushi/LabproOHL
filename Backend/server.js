@@ -15,10 +15,43 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    console.log("NGETEST TOKEN")
+    console.log(token)
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+app.get('/self', authenticateToken, (req, res) => {
+    res.json({
+        status: "success",
+        message: "User authenticated",
+        data: {
+            username: req.user.username,
+            token: req.headers['authorization'].split(' ')[1]
+        }
+    });
+});
+
+
+function authorizeAdmin(req, res, next) {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    next();
+}
+
 
 app.post('/api/register', async (req, res) => {
     const { email, username, password, firstName, lastName } = req.body;
@@ -298,23 +331,6 @@ app.post('/api/wishliststatus', async (req, res) => {
 });
 
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) return res.sendStatus(401);
-
-    jwt.verify(token, secretKey, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-};
-
-function authorizeAdmin(req, res, next) {
-    if (!req.user.isAdmin) return res.sendStatus(403);
-    next();
-}
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
