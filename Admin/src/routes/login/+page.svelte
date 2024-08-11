@@ -15,11 +15,16 @@
 		mutationFn: login,
 		onSuccess: (res) => {
 			if (res.status === 'success') {
+				console.log('Masuk ke lgoin sukses');
 				localStorage.setItem('token', res.data.token);
 				invalidateAuthQuery(queryClient);
 				goto('/dashboard');
 			}
-		}
+		},
+
+		onError: (error) => {
+			console.error('Login error:', error);
+    }
 	});
 
 	$: if (browser && $user.data) {
@@ -93,9 +98,9 @@
 				</Field>
 				<div class="label">
 					<span class="label-text-alt">
-						For demo, you can use username <span class="select-text font-bold">admin</span> and
+						If you use seeding scripts given, you can use username <span class="select-text font-bold">adminuser</span> and
 						password
-						<span class="select-text font-bold">admin123</span>
+						<span class="select-text font-bold">adminpassword</span>
 					</span>
 				</div>
 				<div class="card-actions mt-4">

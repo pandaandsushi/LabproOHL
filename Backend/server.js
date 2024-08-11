@@ -35,16 +35,61 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-app.get('/self', authenticateToken, (req, res) => {
-    res.json({
-        status: "success",
-        message: "User authenticated",
-        data: {
-            username: req.user.username,
-            token: req.headers['authorization'].split(' ')[1]
+app.get('/self', async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // If no token is provided, skip authentication and return a default response
+    if (!token) {
+        return res.json({
+            status: 'success',
+            message: 'No token provided. Proceed to login.',
+            data: null,
+        });
+    }
+
+    // If a token is provided, verify it
+    jwt.verify(token, secretKey, async (err, user) => {
+        if (err) {
+            return res.status(403).json({ status: 'error', message: 'Invalid token', data: null });
+        }
+
+        try {
+            const userId = user.id;
+
+            // Fetch user details from the database
+            const userData = await prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    isAdmin: true,
+                    balance: true,
+                    films: true // Adjust this based on your actual schema
+                }
+            });
+
+            if (!userData) {
+                return res.status(404).json({ status: 'error', message: 'User not found', data: null });
+            }
+
+            // Return user details and the token
+            res.json({
+                status: 'success',
+                message: 'User data retrieved successfully',
+                data: {
+                    username: userData.username,
+                    token: token, // Return the same token that was used for the request
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            res.status(500).json({ status: 'error', message: 'Internal server error', data: null });
         }
     });
 });
+
 
 
 function authorizeAdmin(req, res, next) {
@@ -89,6 +134,56 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const admin = await prisma.user.findFirst({
+            where: {
+                username: username,
+                isAdmin: true,
+            },
+        });
+
+        if (!admin) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid username',
+                data: null,
+            });
+        }
+
+        const validPassword = await bcrypt.compare(password, admin.password);
+
+        if (!validPassword) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid password',
+                data: null,
+            });
+        }
+
+        const token = jwt.sign({ id: admin.id, username: admin.username, isAdmin: true }, secretKey, { expiresIn: '1h' });
+
+        res.json({
+            status: 'success',
+            message: 'Login successful!',
+            data: {
+                username: admin.username,
+                token: token,
+            },
+        });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+            data: null,
+        });
+    }
+});
+
+
 app.post('/api/login', async (req, res) => {
     const { emailOrUsername, password } = req.body;
 
@@ -114,7 +209,6 @@ app.post('/api/login', async (req, res) => {
 
         const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, secretKey, { expiresIn: '1h' });
         console.log(user.balance)
-        // console.log("AJBDKAJB")
         res.json({
             token,
             isAdmin: user.isAdmin,
