@@ -35,11 +35,12 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// bingung sementara aku anggep token gakepake di /self soalnya buat apa..?
+// or am i not getting it
 app.get('/self', async (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    // If no token is provided, skip authentication and return a default response
     if (!token) {
         return res.json({
             status: 'success',
@@ -48,7 +49,6 @@ app.get('/self', async (req, res) => {
         });
     }
 
-    // If a token is provided, verify it
     jwt.verify(token, secretKey, async (err, user) => {
         if (err) {
             return res.status(403).json({ status: 'error', message: 'Invalid token', data: null });
@@ -57,7 +57,6 @@ app.get('/self', async (req, res) => {
         try {
             const userId = user.id;
 
-            // Fetch user details from the database
             const userData = await prisma.user.findUnique({
                 where: { id: userId },
                 select: {
@@ -66,7 +65,7 @@ app.get('/self', async (req, res) => {
                     email: true,
                     isAdmin: true,
                     balance: true,
-                    films: true // Adjust this based on your actual schema
+                    films: true 
                 }
             });
 
@@ -74,13 +73,12 @@ app.get('/self', async (req, res) => {
                 return res.status(404).json({ status: 'error', message: 'User not found', data: null });
             }
 
-            // Return user details and the token
             res.json({
                 status: 'success',
                 message: 'User data retrieved successfully',
                 data: {
                     username: userData.username,
-                    token: token, // Return the same token that was used for the request
+                    token: token, 
                 }
             });
         } catch (error) {
@@ -97,6 +95,72 @@ function authorizeAdmin(req, res, next) {
     next();
 }
 
+app.get('/users', async (req, res) => {
+    try {
+        const { q } = req.query;
+        const users = await prisma.user.findMany({
+            where: {
+                username: {
+                    contains: q,
+                },
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+        res.json({
+            status: 'success',
+            message: 'Users retrieved successfully',
+            data: users,
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve users',
+            data: null,
+        });
+    }
+});
+
+app.get('/user/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found',
+                data: null,
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'User retrieved successfully',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve user',
+            data: null,
+        });
+    }
+});
 
 app.post('/api/register', async (req, res) => {
     const { email, username, password, firstName, lastName } = req.body;

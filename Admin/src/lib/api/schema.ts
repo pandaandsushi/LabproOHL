@@ -6,7 +6,7 @@ export const SimpleUserSchema = z.object({
 });
 
 export const UserSchema = z.object({
-	id: z.string(),
+	id: z.number(),
 	username: z.string(),
 	email: z.string().email(),
 	balance: z.number()

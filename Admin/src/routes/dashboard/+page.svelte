@@ -13,11 +13,13 @@
 	let toDelete: User | null = null;
 	let inc = 0;
 	let timeout: number | null = null;
-
+	console.log("TES")
 	$: users = createQuery({
 		queryKey: ['users', q],
 		queryFn: async () => getUsers(q).then((res) => (res.status === 'success' ? res.data : []))
 	});
+	console.log("PRINT DI PAGE SVELTE")
+	console.log(users)
 
 	$: if (toInc) {
 		const input = document.getElementById(`inc-${toInc}`) as HTMLInputElement;
@@ -38,7 +40,7 @@
 			const prev = $users.data;
 			queryClient.setQueryData(['users', q], (old: User[] | undefined) => {
 				if (!old) return undefined;
-				return old.filter((u) => u.id !== id);
+				return old.filter((u) => u.id.toString() !== id);
 			});
 			return prev;
 		},
@@ -53,7 +55,7 @@
 			queryClient.setQueryData(['users', q], (old: User[] | undefined) => {
 				if (!old) return undefined;
 				return old.map((u) => {
-					if (u.id === data.userId) {
+					if (u.id.toString() === data.userId) {
 						return { ...u, balance: u.balance + data.increment };
 					}
 					return u;
@@ -136,7 +138,7 @@
 					class="btn btn-error btn-sm"
 					on:click={() => {
 						if (!toDelete) return;
-						$deleteMutation.mutate(toDelete.id);
+						$deleteMutation.mutate(toDelete.id.toString());
 						toDelete = null;
 						deleteDialog.close();
 					}}
@@ -172,7 +174,7 @@
 								<button
 									class="btn btn-xs"
 									on:click={() => {
-										toInc = user.id;
+										toInc = user.id.toString();
 										inc = 0;
 									}}
 								>
@@ -182,11 +184,11 @@
 								<form
 									class={clsx(
 										'duration-200',
-										toInc === user.id ? 'opacity-100 h-7 pt-1' : 'h-0 opacity-0'
+										toInc === user.id.toString() ? 'opacity-100 h-7 pt-1' : 'h-0 opacity-0'
 									)}
 									on:submit|preventDefault={() => {
 										if (inc) {
-											$incrementMutation.mutate({ userId: user.id, increment: inc });
+											$incrementMutation.mutate({ userId: user.id.toString(), increment: inc });
 										}
 										toInc = null;
 									}}
@@ -199,7 +201,7 @@
 										step="50"
 										class={clsx(
 											'input input-bordered input-xs w-20 duration-200 text-center',
-											toInc === user.id ? 'h-6' : 'h-0'
+											toInc === user.id.toString() ? 'h-6' : 'h-0'
 										)}
 									/>
 								</form>
