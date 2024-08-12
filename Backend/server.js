@@ -277,7 +277,43 @@ app.delete('/users/:id', async (req, res) => {
     }
 });
 
-
+app.get('/films', async (req, res) => {
+    try {
+        const { q } = req.query;
+        const searchQuery = q ? `%${q}%` : '%';
+        const films = await prisma.$queryRaw`
+            SELECT
+                id,
+                title,
+                director,
+                releaseYear AS "release_year",
+                price,
+                duration,
+                coverImage AS "cover_image_url",
+                createdat AS "created_at",
+                updatedat AS "updated_at"
+            FROM
+                film
+            WHERE
+                title LIKE ${searchQuery} OR
+                director LIKE ${searchQuery}
+        `;
+        console.log("CEK FILM")
+        console.log(films)
+        res.json({
+            status: 'success',
+            message: 'Films retrieved successfully',
+            data: films,
+        });
+    } catch (error) {
+        console.error('Error retrieving films:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve films',
+            data: null,
+        });
+    }
+});
 
 
 

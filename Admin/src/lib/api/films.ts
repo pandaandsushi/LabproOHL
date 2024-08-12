@@ -15,6 +15,8 @@ export async function getFilms(q?: string) {
 	const data = await client()
 		.get(`/films?${searchParams.toString()}`)
 		.then((res) => res.data);
+	console.log("CEK DATA FILM CONTENTS")
+	console.log(data)
 	const parsed = FilmsResponseSchema.parse(data);
 
 	if (parsed.status === 'error') {
