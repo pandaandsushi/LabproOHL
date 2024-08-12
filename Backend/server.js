@@ -27,7 +27,7 @@ const authenticateToken = (req, res, next) => {
     console.log("NGETEST TOKEN")
     console.log(token)
     if (token == null) return res.sendStatus(401);
-
+    
     jwt.verify(token, secretKey, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
@@ -35,12 +35,14 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// PART ADMIN
+
 // bingung sementara aku anggep token gakepake di /self soalnya buat apa..?
 // or am i not getting it
 app.get('/self', async (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-
+    
     if (!token) {
         return res.json({
             status: 'success',
@@ -48,15 +50,15 @@ app.get('/self', async (req, res) => {
             data: null,
         });
     }
-
+    
     jwt.verify(token, secretKey, async (err, user) => {
         if (err) {
             return res.status(403).json({ status: 'error', message: 'Invalid token', data: null });
         }
-
+        
         try {
             const userId = user.id;
-
+            
             const userData = await prisma.user.findUnique({
                 where: { id: userId },
                 select: {
@@ -68,11 +70,11 @@ app.get('/self', async (req, res) => {
                     films: true 
                 }
             });
-
+            
             if (!userData) {
                 return res.status(404).json({ status: 'error', message: 'User not found', data: null });
             }
-
+            
             res.json({
                 status: 'success',
                 message: 'User data retrieved successfully',
@@ -94,110 +96,6 @@ function authorizeAdmin(req, res, next) {
     if (!req.user.isAdmin) return res.sendStatus(403);
     next();
 }
-
-app.get('/users', async (req, res) => {
-    try {
-        const { q } = req.query;
-        const users = await prisma.user.findMany({
-            where: {
-                username: {
-                    contains: q,
-                },
-            },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
-        res.json({
-            status: 'success',
-            message: 'Users retrieved successfully',
-            data: users,
-        });
-    } catch (error) {
-        console.error('Error retrieving users:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to retrieve users',
-            data: null,
-        });
-    }
-});
-
-app.get('/user/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await prisma.user.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'User not found',
-                data: null,
-            });
-        }
-
-        res.json({
-            status: 'success',
-            message: 'User retrieved successfully',
-            data: user,
-        });
-    } catch (error) {
-        console.error('Error retrieving user:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to retrieve user',
-            data: null,
-        });
-    }
-});
-
-app.post('/api/register', async (req, res) => {
-    const { email, username, password, firstName, lastName } = req.body;
-    console.log('Received data:', req.body);
-
-    try {
-        // cek dupe
-        const existingUser = await prisma.user.findFirst({
-            where: {
-                OR: [
-                    { email: email },
-                    { username: username }
-                ]
-            }
-        });
-
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email or Username already exists' });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await prisma.user.create({
-            data: {
-                email: email,
-                username: username,
-                password: hashedPassword,
-                balance: 0,
-            }
-        });
-
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
-    } catch (error) {
-        console.error('Error registering user:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -246,6 +144,182 @@ app.post('/login', async (req, res) => {
         });
     }
 });
+
+app.get('/users', async (req, res) => {
+    try {
+        const { q } = req.query;
+        const users = await prisma.user.findMany({
+            where: {
+                username: {
+                    contains: q,
+                },
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+        res.json({
+            status: 'success',
+            message: 'Users retrieved successfully',
+            data: users,
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve users',
+            data: null,
+        });
+    }
+});
+
+app.get('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found',
+                data: null,
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'User retrieved successfully',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve user',
+            data: null,
+        });
+    }
+});
+
+
+app.post('/users/:id/balance', async (req, res) => {
+    const userId = parseInt(req.params.id, 10); 
+    const { increment } = req.body;
+
+    try {
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                balance: {
+                    increment: increment,
+                },
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+
+        res.json({
+            status: 'success',
+            message: 'Balance updated successfully',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Error updating user balance:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to update balance',
+            data: null,
+        });
+    }
+});
+
+app.delete('/users/:id', async (req, res) => {
+    const userId = parseInt(req.params.id, 10); 
+
+    try {
+        const user = await prisma.user.delete({
+            where: { id: userId },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                balance: true,
+            },
+        });
+
+        res.json({
+            status: 'success',
+            message: 'User deleted successfully',
+            data: user,
+        });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to delete user',
+            data: null,
+        });
+    }
+});
+
+
+
+
+
+
+// PART API BUAT FE AMBIL DATA
+
+app.post('/api/register', async (req, res) => {
+    const { email, username, password, firstName, lastName } = req.body;
+    console.log('Received data:', req.body);
+
+    try {
+        // cek dupe
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: email },
+                    { username: username }
+                ]
+            }
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email or Username already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await prisma.user.create({
+            data: {
+                email: email,
+                username: username,
+                password: hashedPassword,
+                balance: 0,
+            }
+        });
+
+        res.status(201).json({ message: 'User registered successfully', user: newUser });
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 app.post('/api/login', async (req, res) => {
