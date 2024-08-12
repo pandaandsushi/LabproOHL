@@ -100,14 +100,13 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const admin = await prisma.user.findFirst({
-            where: {
-                username: username,
-                isAdmin: true,
-            },
-        });
+        const admin = await prisma.$queryRaw`
+            SELECT id, username, password
+            FROM user
+            WHERE username = ${username} AND isAdmin = true
+        `;
 
-        if (!admin) {
+        if (admin.length === 0) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Invalid username',
@@ -115,7 +114,9 @@ app.post('/login', async (req, res) => {
             });
         }
 
-        const validPassword = await bcrypt.compare(password, admin.password);
+        const adminUser = admin[0];
+
+        const validPassword = await bcrypt.compare(password, adminUser.password);
 
         if (!validPassword) {
             return res.status(400).json({
@@ -125,13 +126,13 @@ app.post('/login', async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ id: admin.id, username: admin.username, isAdmin: true }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ id: adminUser.id, username: adminUser.username, isAdmin: true }, secretKey, { expiresIn: '1h' });
 
         res.json({
             status: 'success',
             message: 'Login successful!',
             data: {
-                username: admin.username,
+                username: adminUser.username,
                 token: token,
             },
         });
@@ -145,22 +146,18 @@ app.post('/login', async (req, res) => {
     }
 });
 
+
 app.get('/users', async (req, res) => {
     try {
         const { q } = req.query;
-        const users = await prisma.user.findMany({
-            where: {
-                username: {
-                    contains: q,
-                },
-            },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
+        const searchQuery = q ? `%${q}%` : '%';
+
+        const users = await prisma.$queryRaw`
+            SELECT id, username, email, balance
+            FROM user
+            WHERE username LIKE ${searchQuery}
+        `;
+
         res.json({
             status: 'success',
             message: 'Users retrieved successfully',
@@ -178,18 +175,15 @@ app.get('/users', async (req, res) => {
 
 app.get('/users/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await prisma.user.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
+        const userId = parseInt(req.params.id, 10);
 
-        if (!user) {
+        const user = await prisma.$queryRaw`
+            SELECT id, username, email, balance
+            FROM user
+            WHERE id = ${userId}
+        `;
+
+        if (user.length === 0) {
             return res.status(404).json({
                 status: 'error',
                 message: 'User not found',
@@ -200,7 +194,7 @@ app.get('/users/:id', async (req, res) => {
         res.json({
             status: 'success',
             message: 'User retrieved successfully',
-            data: user,
+            data: user[0], 
         });
     } catch (error) {
         console.error('Error retrieving user:', error);
@@ -213,30 +207,42 @@ app.get('/users/:id', async (req, res) => {
 });
 
 
+
 app.post('/users/:id/balance', async (req, res) => {
-    const userId = parseInt(req.params.id, 10); 
+    const userId = parseInt(req.params.id, 10);
     const { increment } = req.body;
 
     try {
-        const user = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                balance: {
-                    increment: increment,
-                },
-            },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
+        const user = await prisma.$queryRaw`
+            SELECT id, username, email, balance
+            FROM user
+            WHERE id = ${userId}
+        `;
+
+        if (user.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found',
+                data: null,
+            });
+        }
+
+        await prisma.$queryRaw`
+            UPDATE user
+            SET balance = balance + ${increment}
+            WHERE id = ${userId}
+        `;
+
+        const updatedUser = await prisma.$queryRaw`
+            SELECT id, username, email, balance
+            FROM user
+            WHERE id = ${userId}
+        `;
 
         res.json({
             status: 'success',
             message: 'Balance updated successfully',
-            data: user,
+            data: updatedUser[0],
         });
     } catch (error) {
         console.error('Error updating user balance:', error);
@@ -248,24 +254,34 @@ app.post('/users/:id/balance', async (req, res) => {
     }
 });
 
+
 app.delete('/users/:id', async (req, res) => {
-    const userId = parseInt(req.params.id, 10); 
+    const userId = parseInt(req.params.id, 10);
 
     try {
-        const user = await prisma.user.delete({
-            where: { id: userId },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                balance: true,
-            },
-        });
+        const user = await prisma.$queryRaw`
+            SELECT id, username, email, balance
+            FROM user
+            WHERE id = ${userId}
+        `;
+
+        if (user.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found',
+                data: null,
+            });
+        }
+
+        await prisma.$queryRaw`
+            DELETE FROM user
+            WHERE id = ${userId}
+        `;
 
         res.json({
             status: 'success',
             message: 'User deleted successfully',
-            data: user,
+            data: user[0],
         });
     } catch (error) {
         console.error('Error deleting user:', error);
@@ -276,6 +292,7 @@ app.delete('/users/:id', async (req, res) => {
         });
     }
 });
+
 
 app.get('/films', async (req, res) => {
     try {
@@ -315,6 +332,44 @@ app.get('/films', async (req, res) => {
     }
 });
 
+app.delete('/films/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const filmId = id;
+
+        const film = await prisma.$queryRaw`
+            SELECT id, title, description, director, release_year, genre, video_url, created_at, updated_at
+            FROM films
+            WHERE id = ${filmId}
+        `;
+
+        if (film.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Film not found',
+                data: null,
+            });
+        }
+
+        await prisma.$queryRaw`
+            DELETE FROM films
+            WHERE id = ${filmId}
+        `;
+
+        res.json({
+            status: 'success',
+            message: 'Film deleted successfully',
+            data: film[0],
+        });
+    } catch (error) {
+        console.error('Error deleting film:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to delete film',
+            data: null,
+        });
+    }
+});
 
 
 

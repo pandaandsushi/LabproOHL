@@ -7,23 +7,29 @@ const FilmsResponseSchema = makeSchema(z.array(SimpleFilmSchema));
 const FilmResponseSchema = makeSchema(FilmSchema);
 
 export async function getFilms(q?: string) {
-	const searchParams = new URLSearchParams();
-	if (q) {
-		searchParams.set('q', q);
-	}
+    try {
+        const searchParams = new URLSearchParams();
+        if (q) {
+            searchParams.set('q', q);
+        }
 
-	const data = await client()
-		.get(`/films?${searchParams.toString()}`)
-		.then((res) => res.data);
-	console.log("CEK DATA FILM CONTENTS")
-	console.log(data)
-	const parsed = FilmsResponseSchema.parse(data);
+        const response = await client().get(`/films?${searchParams.toString()}`);
+        const data = response.data;
 
-	if (parsed.status === 'error') {
-		throw new Error(parsed.message);
-	}
+        console.log("CEK DATA FILM CONTENTS");
+        console.log(data);
 
-	return parsed.data;
+        const parsed = FilmsResponseSchema.parse(data);
+
+        if (parsed.status === 'error') {
+            throw new Error(parsed.message);
+        }
+
+        return parsed.data;
+    } catch (error) {
+        console.error("Failed to fetch or parse films data:", error);
+        throw error; // Re-throw the error so it can be handled by the caller
+    }
 }
 
 export async function createFilm(

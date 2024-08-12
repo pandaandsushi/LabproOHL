@@ -13,8 +13,6 @@ export async function getUsers(q?: string) {
 	const data = await client()
 		.get(`/users?${searchParams.toString()}`)
 		.then((res) => res.data);
-	console.log("CEK DATA CONTENTS")
-	console.log(data)
 	return UsersResponseSchema.parse(data);
 }
 

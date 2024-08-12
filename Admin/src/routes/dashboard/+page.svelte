@@ -18,8 +18,6 @@
 		queryKey: ['users', q],
 		queryFn: async () => getUsers(q).then((res) => (res.status === 'success' ? res.data : []))
 	});
-	console.log("PRINT DI PAGE SVELTE")
-	console.log(users)
 
 	$: if (toInc) {
 		const input = document.getElementById(`inc-${toInc}`) as HTMLInputElement;
