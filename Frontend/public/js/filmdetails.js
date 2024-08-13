@@ -151,10 +151,15 @@ class FilmDetailsUI {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    
     const userId = localStorage.getItem('id'); 
     const filmService = new FilmDetailsService(`http://localhost:3001/api/films/`);
     const filmDetailsUI = new FilmDetailsUI('film-details-container');
-
+    if (!userId) {
+        alert('Log in first to view this page.');
+        window.location.href = '/login';
+        return;
+    }
     try {
         const desiredFilm = await filmService.fetchFilmDetails(filmId, userId);
         filmDetailsUI.displayFilmDetails(desiredFilm);

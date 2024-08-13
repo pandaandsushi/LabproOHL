@@ -105,6 +105,15 @@ class FilmUI {
     displayFilms(films) {
         const filmsContainer = document.getElementById('films-container');
         filmsContainer.innerHTML = '';
+
+        if (films.length === 0) {
+            const noFilmsMessage = document.createElement('p');
+            noFilmsMessage.textContent = 'No films to display';
+            noFilmsMessage.classList.add('no-films-message'); 
+            filmsContainer.appendChild(noFilmsMessage);
+            return;
+        }
+
         films.forEach(film => {
             const filmCard = document.createElement('div');
             filmCard.classList.add('film-card');
@@ -122,6 +131,7 @@ class FilmUI {
 
     displayPagination(totalPages, currentPage, onPageClick) {
         this.pagination.innerHTML = '';
+        if (totalPages <= 1) return; 
         for (let i = 1; i <= totalPages; i++) {
             const pageButton = document.createElement('button');
             pageButton.innerText = i;
@@ -133,6 +143,7 @@ class FilmUI {
         }
     }
 }
+
 
 class PollingService {
     constructor(apiUrl, onNewFilms) {

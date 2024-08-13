@@ -4,6 +4,15 @@ body {
     background-color: #1E1E1E;
     color: #FFF;
 }
+
+.no-films-message {
+    text-align: center;
+    font-family: "Quicksand";
+    font-size: 18px;
+    color: #ffffff;
+    margin-top: 20px;
+}
+
 .browse-title {
     font-family: "Paytone One";
     padding-left: 100px;
@@ -99,4 +108,11 @@ body {
 
 .pagination button:hover {
     background-color: #777;
+}
+
+@media (max-width: 768px) {
+    .browse-title {
+        text-align: center;
+        padding: 0;
+    }
 }
