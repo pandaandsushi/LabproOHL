@@ -5,7 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const username = localStorage.getItem('username'); 
     const balance = localStorage.getItem('balance'); 
     const films = localStorage.getItem('films'); 
+    const hamburger = document.getElementById('hamburger');
+    const navList = document.getElementById('nav-list');
 
+    hamburger.addEventListener('click', function () {
+        navList.classList.toggle('active');
+    });
     console.log(balance)
     if (token && username) {
         loginContainer.innerHTML = `
