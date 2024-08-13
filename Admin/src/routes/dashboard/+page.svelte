@@ -38,7 +38,7 @@
 			const prev = $users.data;
 			queryClient.setQueryData(['users', q], (old: User[] | undefined) => {
 				if (!old) return undefined;
-				return old.filter((u) => u.id.toString() !== id);
+				return old.filter((u) => u.id !== id);
 			});
 			return prev;
 		},
@@ -53,7 +53,7 @@
 			queryClient.setQueryData(['users', q], (old: User[] | undefined) => {
 				if (!old) return undefined;
 				return old.map((u) => {
-					if (u.id.toString() === data.userId) {
+					if (u.id === data.userId) {
 						return { ...u, balance: u.balance + data.increment };
 					}
 					return u;
@@ -136,7 +136,7 @@
 					class="btn btn-error btn-sm"
 					on:click={() => {
 						if (!toDelete) return;
-						$deleteMutation.mutate(toDelete.id.toString());
+						$deleteMutation.mutate(toDelete.id);
 						toDelete = null;
 						deleteDialog.close();
 					}}
@@ -172,7 +172,7 @@
 								<button
 									class="btn btn-xs"
 									on:click={() => {
-										toInc = user.id.toString();
+										toInc = user.id;
 										inc = 0;
 									}}
 								>
@@ -182,11 +182,11 @@
 								<form
 									class={clsx(
 										'duration-200',
-										toInc === user.id.toString() ? 'opacity-100 h-7 pt-1' : 'h-0 opacity-0'
+										toInc === user.id ? 'opacity-100 h-7 pt-1' : 'h-0 opacity-0'
 									)}
 									on:submit|preventDefault={() => {
 										if (inc) {
-											$incrementMutation.mutate({ userId: user.id.toString(), increment: inc });
+											$incrementMutation.mutate({ userId: user.id, increment: inc });
 										}
 										toInc = null;
 									}}
@@ -199,7 +199,7 @@
 										step="50"
 										class={clsx(
 											'input input-bordered input-xs w-20 duration-200 text-center',
-											toInc === user.id.toString() ? 'h-6' : 'h-0'
+											toInc === user.id ? 'h-6' : 'h-0'
 										)}
 									/>
 								</form>

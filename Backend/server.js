@@ -79,6 +79,7 @@ app.get('/self', async (req, res) => {
                 status: 'success',
                 message: 'User data retrieved successfully',
                 data: {
+                    id: userData.id.toString(),
                     username: userData.username,
                     token: token, 
                 }
@@ -154,10 +155,15 @@ app.get('/users', async (req, res) => {
             SELECT id, username, email, balance FROM user WHERE username LIKE ${searchQuery}
         `;
 
+        const usersWithStringId = users.map(user => ({
+            ...user,
+            id: user.id.toString(),
+        }));
+
         res.json({
             status: 'success',
             message: 'Users retrieved successfully',
-            data: users,
+            data: usersWithStringId,
         });
     } catch (error) {
         console.error('Error retrieving users:', error);
@@ -168,6 +174,7 @@ app.get('/users', async (req, res) => {
         });
     }
 });
+
 
 app.get('/users/:id', async (req, res) => {
     try {
@@ -188,7 +195,10 @@ app.get('/users/:id', async (req, res) => {
         res.json({
             status: 'success',
             message: 'User retrieved successfully',
-            data: user[0], 
+            data: {
+                ...user[0],
+                id: user[0].id.toString(),
+            },
         });
     } catch (error) {
         console.error('Error retrieving user:', error);
@@ -199,6 +209,7 @@ app.get('/users/:id', async (req, res) => {
         });
     }
 });
+
 
 
 
@@ -230,7 +241,10 @@ app.post('/users/:id/balance', async (req, res) => {
         res.json({
             status: 'success',
             message: 'Balance updated successfully',
-            data: updatedUser[0],
+            data: {
+                ...updatedUser[0],
+                id: updatedUser[0].id.toString(),
+            },
         });
     } catch (error) {
         console.error('Error updating user balance:', error);
@@ -241,6 +255,7 @@ app.post('/users/:id/balance', async (req, res) => {
         });
     }
 });
+
 
 
 app.delete('/users/:id', async (req, res) => {
@@ -266,7 +281,10 @@ app.delete('/users/:id', async (req, res) => {
         res.json({
             status: 'success',
             message: 'User deleted successfully',
-            data: user[0],
+            data: {
+                ...user[0],
+                id: user[0].id.toString(),
+            },
         });
     } catch (error) {
         console.error('Error deleting user:', error);
