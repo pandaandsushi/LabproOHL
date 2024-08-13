@@ -101,9 +101,7 @@ app.post('/login', async (req, res) => {
 
     try {
         const admin = await prisma.$queryRaw`
-            SELECT id, username, password
-            FROM user
-            WHERE username = ${username} AND isAdmin = true
+            SELECT id, username, password FROM user WHERE username = ${username} AND isAdmin = true
         `;
 
         if (admin.length === 0) {
@@ -153,9 +151,7 @@ app.get('/users', async (req, res) => {
         const searchQuery = q ? `%${q}%` : '%';
 
         const users = await prisma.$queryRaw`
-            SELECT id, username, email, balance
-            FROM user
-            WHERE username LIKE ${searchQuery}
+            SELECT id, username, email, balance FROM user WHERE username LIKE ${searchQuery}
         `;
 
         res.json({
@@ -178,9 +174,7 @@ app.get('/users/:id', async (req, res) => {
         const userId = parseInt(req.params.id, 10);
 
         const user = await prisma.$queryRaw`
-            SELECT id, username, email, balance
-            FROM user
-            WHERE id = ${userId}
+            SELECT id, username, email, balance FROM user WHERE id = ${userId}
         `;
 
         if (user.length === 0) {
@@ -214,9 +208,7 @@ app.post('/users/:id/balance', async (req, res) => {
 
     try {
         const user = await prisma.$queryRaw`
-            SELECT id, username, email, balance
-            FROM user
-            WHERE id = ${userId}
+            SELECT id, username, email, balance FROM user WHERE id = ${userId}
         `;
 
         if (user.length === 0) {
@@ -228,15 +220,11 @@ app.post('/users/:id/balance', async (req, res) => {
         }
 
         await prisma.$queryRaw`
-            UPDATE user
-            SET balance = balance + ${increment}
-            WHERE id = ${userId}
+            UPDATE user SET balance = balance + ${increment} WHERE id = ${userId}
         `;
 
         const updatedUser = await prisma.$queryRaw`
-            SELECT id, username, email, balance
-            FROM user
-            WHERE id = ${userId}
+            SELECT id, username, email, balance FROM user WHERE id = ${userId}
         `;
 
         res.json({
@@ -260,9 +248,7 @@ app.delete('/users/:id', async (req, res) => {
 
     try {
         const user = await prisma.$queryRaw`
-            SELECT id, username, email, balance
-            FROM user
-            WHERE id = ${userId}
+            SELECT id, username, email, balance FROM user WHERE id = ${userId}
         `;
 
         if (user.length === 0) {
@@ -274,8 +260,7 @@ app.delete('/users/:id', async (req, res) => {
         }
 
         await prisma.$queryRaw`
-            DELETE FROM user
-            WHERE id = ${userId}
+            DELETE FROM user WHERE id = ${userId}
         `;
 
         res.json({
@@ -309,11 +294,8 @@ app.get('/films', async (req, res) => {
                 coverImage AS "cover_image_url",
                 createdat AS "created_at",
                 updatedat AS "updated_at"
-            FROM
-                film
-            WHERE
-                title LIKE ${searchQuery} OR
-                director LIKE ${searchQuery}
+            FROM film
+            WHERE title LIKE ${searchQuery} OR director LIKE ${searchQuery}
         `;
         console.log("CEK FILM")
         console.log(films)
@@ -338,10 +320,7 @@ app.delete('/films/:id', async (req, res) => {
         const filmId = id;
 
         const film = await prisma.$queryRaw`
-            SELECT id, title, description, director, release_year, genre, video_url, created_at, updated_at
-            FROM films
-            WHERE id = ${filmId}
-        `;
+            SELECT id, title, description, director, release_year, genre, video_url, created_at, updated_at FROM films WHERE id = ${filmId}`;
 
         if (film.length === 0) {
             return res.status(404).json({
@@ -352,9 +331,7 @@ app.delete('/films/:id', async (req, res) => {
         }
 
         await prisma.$queryRaw`
-            DELETE FROM films
-            WHERE id = ${filmId}
-        `;
+            DELETE FROM films WHERE id = ${filmId}`;
 
         res.json({
             status: 'success',
@@ -456,11 +433,9 @@ app.post('/api/login', async (req, res) => {
 
 app.get('/api/films', async (req, res) => {
     try {
-        // console.error("MASUK SINI");
         const films = await prisma.$queryRaw`SELECT * FROM film`; 
         res.json(films);
     } catch (error) {
-        // console.error("NGEROR", error); 
         res.status(500).json({ error: 'Failed to fetch films' });
     }
 });
@@ -479,11 +454,8 @@ app.get('/api/films/:id', async (req, res) => {
     const userId = req.query.userId;
 
     try {
-        // Fetch the film details
         const film = await prisma.$queryRaw`
-            SELECT * 
-            FROM Film 
-            WHERE id = ${Number(id)}
+            SELECT * FROM Film WHERE id = ${Number(id)}
         `;
 
         if (!film.length) {
@@ -492,10 +464,7 @@ app.get('/api/films/:id', async (req, res) => {
 
         // cek udah beli
         const purchaseCheck = await prisma.$queryRaw`
-            SELECT 1
-            FROM FilmUser
-            WHERE userId = ${Number(userId)} AND filmId = ${Number(id)}
-        `;
+            SELECT 1 FROM FilmUser WHERE userId = ${Number(userId)} AND filmId = ${Number(id)}`;
 
         const isPurchased = purchaseCheck.length > 0;
         // console.log("NGECEK ISPURCHASED DI SERVER")
@@ -512,7 +481,7 @@ app.get('/api/films/:id', async (req, res) => {
 
 app.get('/api/users/:id', async (req, res) => {
     const { username } = req.params;
-    console.log({username})
+    // console.log({username})
     try {
         const user = await prisma.$queryRaw`SELECT * FROM user WHERE id = ${Number(id)}`;
         res.json(user);
@@ -526,10 +495,7 @@ app.post('/api/purchasestatus', async (req, res) => {
     try {
         // cek udh beli
         const existingPurchase = await prisma.$queryRaw`
-            SELECT 1
-            FROM FilmUser
-            WHERE userId = ${userId} AND filmId = ${filmId}
-        `;
+            SELECT 1 FROM FilmUser WHERE userId = ${userId} AND filmId = ${filmId}`;
         if (existingPurchase.length) {
             console.log("ALR PURCHASED!")
             return res.status(400).json({ message: 'Film already purchased' });//tes fallback
@@ -540,14 +506,9 @@ app.post('/api/purchasestatus', async (req, res) => {
         
         const [user, film] = await Promise.all([
             prisma.$queryRaw`
-                SELECT * 
-                FROM User
-                WHERE id = ${userId}
-            `,
+                SELECT * FROM User WHERE id = ${userId}`,
             prisma.$queryRaw`
-                SELECT * 
-                FROM Film
-                WHERE id = ${filmId}
+                SELECT * FROM Film WHERE id = ${filmId}
             `
         ]);
         if (!user.length || !film.length) {
