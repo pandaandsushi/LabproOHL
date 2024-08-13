@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.removeItem('token');
             localStorage.removeItem('isAdmin');
             localStorage.removeItem('username');
+            localStorage.removeItem('id');
             window.location.href = '/login';
         });
     }

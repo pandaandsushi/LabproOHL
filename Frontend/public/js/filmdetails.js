@@ -90,7 +90,7 @@ class FilmDetailsUI {
         }
     
         if (film.isWishlisted) {
-            wishlistButton.textContent = 'Add to Wishlist';
+            wishlistButton.textContent = 'Remove from Wishlist';
             wishlistButton.onclick = async () => {
                 try {
                     const response = await fetch('http://localhost:3001/api/wishliststatus', {
@@ -118,7 +118,7 @@ class FilmDetailsUI {
                 }
             };
         } else {
-            wishlistButton.textContent = 'Remove from Wishlist';
+            wishlistButton.textContent = 'Add to Wishlist';
             wishlistButton.onclick = async () => {
                 try {
                     const response = await fetch('http://localhost:3001/api/wishliststatus', {

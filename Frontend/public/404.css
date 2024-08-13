@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1E1E1E;
+    color: #FFF;
+}
+
+.notfound-title {
+    font-size: 60px;
+    margin: 0;
+    font-family: "Paytone One";    
+}
+
+.notfound-desc {
+    font-size: 30px;
+    margin: 0;
+    font-family: "Quicksand";
+}
+
+.notfound-content {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.notfound-button {
+    color: white;
+    font-family: "Quicksand";
+    font-style: normal;
+    font-weight: 400;
+    font-weight: bolder;
+    background-color: #f44336; 
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    margin: 20px;
+}
+
+.notfound-button:hover {
+background-color: #a01919; 
+}
+
+.notfound-button:active {
+transform: translateY(2px);
+}

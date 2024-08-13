@@ -7,17 +7,6 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-let films = [
-  { name: 'Dummy 1', director: 'Director 1', image: 'img/Dummy1.jpg' },
-  { name: 'Dummy 2', director: 'Director 2', image: 'img/Dummy2.jpg' },
-  { name: 'Dummy 3', director: 'Director 3', image: 'img/Dummy3.jpg' },
-  { name: 'Dummy 4', director: 'Director 4', image: 'img/Dummy4.jpg' },
-  { name: 'Dummy 5', director: 'Director 5', image: 'img/Dummy5.jpg' },
-  { name: 'Dummy 6', director: 'Director 6', image: 'img/Dummy6.jpg' },
-  { name: 'Dummy 7', director: 'Director 7', image: 'img/Dummy7.jpg' },
-  { name: 'Dummy 8', director: 'Director 8', image: 'img/Dummy8.jpg' },
-  { name: 'Dummy 9', director: 'Director 9', image: 'img/Dummy9.jpg' },
-];
 
 const faqData = [
   {
@@ -67,11 +56,9 @@ app.get('/filmdetails', (req, res) => {
     res.render('filmdetails', { title: 'Film Details' });
 });
 
-app.get('/api/get-latest-films', (req, res) => {
-  const since = parseInt(req.query.since, 10);
-  const newFilms = films.filter(film => film.timestamp > since);
-  res.json({ newFilms });
-})
+app.use((req, res, next) => {
+  res.status(404).render('404', { title: 'Page Not Found' });
+});
 
 app.get('/filmdetails/:id', async (req, res) => {
   const { id } = req.params;
