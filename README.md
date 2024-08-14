@@ -1,12 +1,12 @@
 #  OHLLabpro - NELFLIX
 ### Thea Josephine - 13522012
-Seleksi Labpro Tahap 3
+
 ## Table of Contents 💫
-* [The Game](#the-algorithm) 👾 
-* [Tools](#tools-and-libraries) 🔨
-* [Requirements](#requirements) 🫧
-* [Setting Up](#setting-up) 🍀
-* [How To Use](#how-to-use) 🪄
+* [Design Pattern](#design-pattern)
+* [Endpoints](#endpoints)
+* [Bonuses](#bonuses)
+* [Tools](#tools-and-libraries)
+* [How To Use](#how-to-use)
 
 ## Design Pattern
 - Singleton Pattern
@@ -32,14 +32,8 @@ To display the purchased films or wishlisted films using the same frontend logic
 - MySQL
 - Prisma
 
-## Requirements
-- Have npm installed with `npm install`
-
-## Setting Up
-- Clone this repository on your terminal `https://github.com/pandaandsushi/LabproOHL.git`
-
-
 ## How to Use
+Manually
 - Create a database, for me i use MariaDB `create database {db name}` then `use {db name}`.
 - Ensure that the `DATABASE_URL` environment variable in your .env (inside Backend folder) file is correctly set and accessible based on your db `mysql://{username}:{password}@localhost:3306/{db name}`
 - run `npm install` in Admin, Backend, and Frontend folder each. Also make sure you have npm and node installed in ur system
