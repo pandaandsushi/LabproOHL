@@ -334,31 +334,48 @@ const server = http.createServer(async (req, res) => {
     else if (method === 'GET' && path === '/films') {
         try {
             const searchQuery = parsedUrl.query.q ? `%${parsedUrl.query.q}%` : '%';
-
+    
             const films = await prisma.$queryRaw`
                 SELECT
-                    id,
-                    title,
-                    director,
-                    releaseYear AS 'release_year',
-                    price,
-                    duration,
-                    video AS 'video_url',
-                    coverImage AS 'cover_image_url',
-                    createdat AS 'created_at',
-                    updatedat AS 'updated_at'
-                FROM film
-                WHERE title LIKE ${searchQuery} OR director LIKE ${searchQuery}
+                    f.id,
+                    f.title,
+                    f.director,
+                    f.releaseYear AS 'release_year',
+                    f.price,
+                    f.duration,
+                    f.video AS 'video_url',
+                    f.coverImage AS 'cover_image_url',
+                    f.createdAt AS 'created_at',
+                    f.updatedAt AS 'updated_at',
+                    GROUP_CONCAT(g.name) AS genres
+                FROM
+                    film f
+                    LEFT JOIN FilmGenre fg ON f.id = fg.filmId
+                    LEFT JOIN Genre g ON fg.genreId = g.id
+                WHERE
+                    f.title LIKE ${searchQuery} OR f.director LIKE ${searchQuery}
+                GROUP BY f.id
             `;
-
-            console.log("CEK FILM");
-            console.log(films);
-
+            
+            const formattedFilms = films.map(film => ({
+                id: film.id.toString(),
+                title: film.title,
+                director: film.director,
+                release_year: film.release_year,
+                price: film.price,
+                duration: film.duration,
+                cover_image_url: film.cover_image_url,
+                created_at: new Date(film.created_at).toISOString(),
+                updated_at: new Date(film.updated_at).toISOString(),
+                genre: film.genres ? film.genres.split(',') : []
+            }));
+            // console.log("TEST FORMATTED DI ADMIN FILMS")
+            // console.log(formattedFilms)
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
                 status: 'success',
                 message: 'Films retrieved successfully',
-                data: films,
+                data: formattedFilms,
             }));
         } catch (error) {
             console.error('Error retrieving films:', error);
@@ -369,18 +386,36 @@ const server = http.createServer(async (req, res) => {
                 data: null,
             }));
         }
-    } 
-    else if (method === 'DELETE' && path.startsWith('/films/')) {
+    }
+
+    else if (method === 'GET' && path.startsWith('/films/')) {
+        const id = path.split('/').pop();
+    
         try {
-            const filmId = path.split('/')[2];
-
             const film = await prisma.$queryRaw`
-                SELECT id, title, description, director, release_year, genre, video_url, created_at, updated_at 
-                FROM films 
-                WHERE id = ${filmId}
+                SELECT
+                    f.id,
+                    f.title,
+                    f.description,
+                    f.director,
+                    f.releaseYear AS 'release_year',
+                    f.price,
+                    f.duration,
+                    f.video AS 'video_url',
+                    f.coverImage AS 'cover_image_url',
+                    f.createdAt AS 'created_at',
+                    f.updatedAt AS 'updated_at',
+                    GROUP_CONCAT(g.name) AS genres
+                FROM
+                    film f
+                    LEFT JOIN FilmGenre fg ON f.id = fg.filmId
+                    LEFT JOIN Genre g ON fg.genreId = g.id
+                WHERE
+                    f.id = ${id}
+                GROUP BY f.id
             `;
-
-            if (film.length === 0) {
+    
+            if (!film.length) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     status: 'error',
@@ -389,16 +424,107 @@ const server = http.createServer(async (req, res) => {
                 }));
                 return;
             }
-
-            await prisma.$queryRaw`
-                DELETE FROM films WHERE id = ${filmId}
+    
+            const filmData = film[0];
+    
+            const formattedFilm = {
+                id: filmData.id.toString(),
+                title: filmData.title,
+                description: filmData.description,
+                director: filmData.director,
+                release_year: filmData.release_year,
+                genre: filmData.genres ? filmData.genres.split(',') : [],
+                price: filmData.price,
+                duration: filmData.duration,
+                video_url: filmData.video_url,
+                cover_image_url: filmData.cover_image_url,
+                created_at: new Date(filmData.created_at).toISOString(),
+                updated_at: new Date(filmData.updated_at).toISOString(),
+            };
+    
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                status: 'success',
+                message: 'Film retrieved successfully',
+                data: formattedFilm,
+            }));
+        } catch (error) {
+            console.error('Error retrieving film details:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                status: 'error',
+                message: 'Failed to retrieve film details',
+                data: null,
+            }));
+        }
+    }
+    
+     
+    else if (method === 'DELETE' && path.startsWith('/films/')) {
+        const id = path.split('/').pop();
+    
+        try {
+            const filmToDelete = await prisma.$queryRaw`
+                SELECT
+                    f.id,
+                    f.title,
+                    f.description,
+                    f.director,
+                    f.releaseYear AS 'release_year',
+                    f.price,
+                    f.duration,
+                    f.video AS 'video_url',
+                    f.coverImage AS 'cover_image_url',
+                    f.createdAt AS 'created_at',
+                    f.updatedAt AS 'updated_at',
+                    GROUP_CONCAT(g.name) AS genres
+                FROM
+                    film f
+                    LEFT JOIN FilmGenre fg ON f.id = fg.filmId
+                    LEFT JOIN Genre g ON fg.genreId = g.id
+                WHERE
+                    f.id = ${id}
+                GROUP BY f.id
             `;
-
+            console.log("MAU DELETE FILM INI NIH")
+            console.log(filmToDelete)
+            if (!filmToDelete.length) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    status: 'error',
+                    message: 'Film not found',
+                    data: null,
+                }));
+                return;
+            }
+    
+            await prisma.$queryRaw`
+                DELETE FROM filmuser WHERE filmId = ${Number(id)}`;
+            await prisma.$queryRaw`
+                DELETE FROM filmgenre WHERE filmId = ${Number(id)}`;
+            await prisma.$queryRaw`
+                DELETE FROM film WHERE id = ${Number(id)}`;
+            console.log("BERHASIL LEWAT MEMBUANG")
+            const deletedFilm = filmToDelete[0];
+    
+            const formattedFilm = {
+                id: deletedFilm.id.toString(),
+                title: deletedFilm.title,
+                description: deletedFilm.description,
+                director: deletedFilm.director,
+                release_year: deletedFilm.release_year,
+                genre: deletedFilm.genres ? deletedFilm.genres.split(',') : [],
+                video_url: deletedFilm.video_url,
+                cover_image_url: deletedFilm.cover_image_url,
+                created_at: new Date(deletedFilm.created_at).toISOString(),
+                updated_at: new Date(deletedFilm.updated_at).toISOString(),
+            };
+    
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
                 status: 'success',
                 message: 'Film deleted successfully',
-                data: film[0],
+                data: formattedFilm,
             }));
         } catch (error) {
             console.error('Error deleting film:', error);
@@ -409,7 +535,8 @@ const server = http.createServer(async (req, res) => {
                 data: null,
             }));
         }
-    } 
+    }
+    
     
     else if (method === 'POST' && path === '/api/register') {
         let body = '';
@@ -533,7 +660,7 @@ const server = http.createServer(async (req, res) => {
                 description: film.description,
                 director: film.director,
                 release_year: film.releaseYear,
-                genre: film.genre.map(fg => fg.genre.name), // Adjusted to match schema
+                genre: film.genre.map(fg => fg.genre.name), 
                 price: film.price,
                 duration: film.duration,
                 cover_image_url: film.coverImage,

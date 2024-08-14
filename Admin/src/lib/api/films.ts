@@ -20,8 +20,8 @@ export async function getFilms(q?: string) {
         console.log(data);
 
         const parsed = FilmsResponseSchema.parse(data);
-
         if (parsed.status === 'error') {
+			console.log("EROR BANH")
             throw new Error(parsed.message);
         }
 
