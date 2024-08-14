@@ -30,15 +30,30 @@ model Film {
   description String
   director    String
   releaseYear Int
-  genre       String
+  genre       FilmGenre[]
   price       Float
   duration    Int
   coverImage  String?
-  video       String?
+  video       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   users     FilmUser[]
   wishlists  Wishlist[]
+}
+
+model Genre {
+  id      Int         @id @default(autoincrement())
+  name    String      @unique
+  films   FilmGenre[]
+}
+
+model FilmGenre {
+  filmId  Int
+  genreId Int
+  film    Film  @relation(fields: [filmId], references: [id])
+  genre   Genre @relation(fields: [genreId], references: [id])
+
+  @@unique([filmId, genreId])
 }
 
 model FilmUser {

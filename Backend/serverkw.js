@@ -340,12 +340,13 @@ const server = http.createServer(async (req, res) => {
                     id,
                     title,
                     director,
-                    releaseYear AS "release_year",
+                    releaseYear AS 'release_year',
                     price,
                     duration,
-                    coverImage AS "cover_image_url",
-                    createdat AS "created_at",
-                    updatedat AS "updated_at"
+                    video AS 'video_url',
+                    coverImage AS 'cover_image_url',
+                    createdat AS 'created_at',
+                    updatedat AS 'updated_at'
                 FROM film
                 WHERE title LIKE ${searchQuery} OR director LIKE ${searchQuery}
             `;
@@ -514,43 +515,81 @@ const server = http.createServer(async (req, res) => {
 
     else if (method === 'GET' && path === '/api/films') {
         try {
-            const films = await prisma.$queryRaw`SELECT * FROM film`;
+            const films = await prisma.film.findMany({
+                include: {
+                    genre: {
+                        include: {
+                            genre: true,
+                        },
+                    },
+                },
+            });
+    
+            console.log("INI FILM BANYAKK", films);
+    
+            const formattedFilms = films.map(film => ({
+                id: film.id,
+                title: film.title,
+                description: film.description,
+                director: film.director,
+                release_year: film.releaseYear,
+                genre: film.genre.map(fg => fg.genre.name), // Adjusted to match schema
+                price: film.price,
+                duration: film.duration,
+                cover_image_url: film.coverImage,
+                created_at: film.createdAt,
+                updated_at: film.updatedAt,
+            }));
+    
+            // console.log("INI FORMATTED FILM", formattedFilms);
+    
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(films));
+            res.end(JSON.stringify(formattedFilms));
         } catch (error) {
             console.error('Error fetching films:', error);
             res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Failed to fetch films' }));
+            res.end(JSON.stringify({ error: 'Internal server error' }));
         }
     }
+    
     
     else if (method === 'GET' && path.startsWith('/api/films/')) {
         const id = path.split('/').pop();
         const userId = parsedUrl.query.userId;
-
+    
         try {
-            const film = await prisma.$queryRaw`SELECT * FROM Film WHERE id = ${Number(id)}`;
-
-            if (!film.length) {
+            const film = await prisma.film.findUnique({
+                where: { id: Number(id) },
+                include: {
+                    genre: {
+                        include: {
+                            genre: true,
+                        },
+                    },
+                },
+            });
+    
+            if (!film) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Film not found' }));
                 return;
             }
-
-            const purchaseCheck = await prisma.$queryRaw`
-                SELECT 1 FROM FilmUser WHERE userId = ${Number(userId)} AND filmId = ${Number(id)}
-            `;
-
+    
+            const purchaseCheck = await prisma.$queryRaw`SELECT 1 FROM FilmUser WHERE userId = ${Number(userId)} AND filmId = ${Number(id)}`;
+    
             const isPurchased = purchaseCheck.length > 0;
-
+            
+            const genres = film.genre.map(fg => fg.genre.name).join(', ');
+    
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ...film[0], isPurchased }));
+            res.end(JSON.stringify({ ...film, genre: genres, isPurchased }));
         } catch (error) {
             console.error('Error fetching film details:', error);
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Internal server error' }));
         }
     }
+    
 
     else if (method === 'GET' && path === '/api/users') {
         try {
@@ -628,7 +667,10 @@ const server = http.createServer(async (req, res) => {
 
                 const userRecord = user[0];
                 const filmRecord = film[0];
-
+                // console.log("TES BALANCE")
+                // console.log(userRecord)
+                // console.log(userRecord.balance)
+                // console.log(filmRecord.price)
                 if (userRecord.balance < filmRecord.price) {
                     return res.writeHead(400, { 'Content-Type': 'application/json' })
                         .end(JSON.stringify({ message: 'Not enough balance' }));

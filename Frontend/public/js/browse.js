@@ -38,6 +38,7 @@ class BrowseFilmStrategy extends FilmFetchingStrategy {
         try {
             const response = await fetch(this.apiUrl);
             const filmsData = await response.json();
+            console.log("Fetched films data:", filmsData);
             return filmsData.map(filmData => new Film(
                 filmData.id,
                 filmData.title,
