@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browse</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/browse.css">
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="../public//styles.css">
+    <link rel="stylesheet" href="../public//browse.css">
 </head>
 <body>
     <%- include('partials/navbar') %>
     <div class="browse">
-        <h1 class="browse-title">Browse Films</h1>
+        <h1 class="browse-title">Wishlist</h1>
         <div class="browse-searchbar">
             <input type="text" id="search-box" placeholder="Search films by name or director...">
             <button class="browse-button" onclick="searchFilms()">Search</button>
@@ -22,6 +22,6 @@
             <!-- Pagi -->
         </div>
     </div>
-    <script src="/js/browse.js"></script>
+    <script src="../../public/js/browse.js"></script>
 </body>
 </html>

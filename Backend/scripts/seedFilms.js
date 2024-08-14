@@ -2,9 +2,10 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
+    await prisma.film.deleteMany({});
     await prisma.film.createMany({
         data: [
-            { title: 'Fast x Furious 1', director: 'Director 1', coverImage: 'img/Dummy1.jpg', description: 'Description 1', releaseYear: 2020, genre: 'Genre 1', price: 1.0, duration: 120 },
+            { title: 'Fast x Furious 1', director: 'Director 1', coverImage: '../../Frontend/public/img/Dummy1.jpg', description: 'Description 1', releaseYear: 2020, genre: 'Genre 1', price: 1.0, duration: 120 },
             { title: 'Fast x Furious 2', director: 'Director 2', coverImage: 'img/Dummy2.jpg', description: 'Description 2', releaseYear: 2021, genre: 'Genre 2', price: 11.0, duration: 130 },
             { title: 'Fast x Furious 3', director: 'Director 3', coverImage: 'img/Dummy3.jpg', description: 'Description 3', releaseYear: 2022, genre: 'Genre 3', price: 12.0, duration: 120 },
             { title: 'Fast x Furious 4', director: 'Director 4', coverImage: 'img/Dummy4.jpg', description: 'Description 4', releaseYear: 2023, genre: 'Genre 4', price: 16.0, duration: 150 },

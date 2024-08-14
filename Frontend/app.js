@@ -56,9 +56,9 @@ app.get('/filmdetails', (req, res) => {
     res.render('filmdetails', { title: 'Film Details' });
 });
 
-// app.use((req, res, next) => {
-//   res.status(404).render('404', { title: 'Page Not Found' });
-// });
+app.use((req, res, next) => {
+  res.status(404).render('404', { title: 'Page Not Found' });
+});
 
 app.get('/filmdetails/:id', async (req, res) => {
   const { id } = req.params;
