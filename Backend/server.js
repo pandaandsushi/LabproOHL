@@ -42,7 +42,8 @@ const authenticateToken = (req, res, next) => {
 app.get('/self', async (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
+    console.log("INI TOKEN")
+    console.log(token)
     if (!token) {
         return res.json({
             status: 'success',

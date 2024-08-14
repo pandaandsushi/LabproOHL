@@ -1,4 +1,3 @@
-const querystring = require('querystring')
 const http = require('http');
 const url = require('url');
 const bcrypt = require('bcrypt');
@@ -24,7 +23,8 @@ const server = http.createServer(async (req, res) => {
     if (method === 'GET' && path === '/self') {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
-
+        // console.log("INI TOKEN")
+        // console.log(token)
         if (!token) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
@@ -34,21 +34,31 @@ const server = http.createServer(async (req, res) => {
             }));
             return;
         }
-
+    
         jwt.verify(token, secretKey, async (err, user) => {
             if (err) {
-                res.writeHead(403, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({
-                    status: 'error',
-                    message: 'Invalid token',
-                    data: null,
-                }));
+                if (err.name === 'TokenExpiredError') {
+                    console.error('Token has expired:', err);
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        status: 'error',
+                        message: 'Token has expired. Please log in again.',
+                        data: null,
+                    }));
+                } else {
+                    console.error('Token verification error:', err);
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        status: 'error',
+                        message: 'Invalid token',
+                        data: null,
+                    }));
+                }
                 return;
             }
-
+    
             try {
                 const userId = user.id;
-
                 const userData = await prisma.user.findUnique({
                     where: { id: userId },
                     select: {
@@ -60,7 +70,7 @@ const server = http.createServer(async (req, res) => {
                         films: true,
                     }
                 });
-
+    
                 if (!userData) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
@@ -70,7 +80,7 @@ const server = http.createServer(async (req, res) => {
                     }));
                     return;
                 }
-
+    
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     status: 'success',
@@ -91,8 +101,9 @@ const server = http.createServer(async (req, res) => {
                 }));
             }
         });
-    } 
-
+    }
+    
+    
     else if (method === 'POST' && path === '/login') {
         let body = '';
 
@@ -101,7 +112,7 @@ const server = http.createServer(async (req, res) => {
         });
 
         req.on('end', async () => {
-            const { username, password } = querystring.parse(body);
+            const { username, password } = JSON.parse(body);
 
             try {
                 const admin = await prisma.$queryRaw`
@@ -230,7 +241,7 @@ const server = http.createServer(async (req, res) => {
         });
 
         req.on('end', async () => {
-            const { increment } = querystring.parse(body);
+            const { increment } = JSON.parse(body);
 
             try {
                 const user = await prisma.$queryRaw`
@@ -294,8 +305,11 @@ const server = http.createServer(async (req, res) => {
             }
 
             await prisma.$queryRaw`
-                DELETE FROM user WHERE id = ${userId}
-            `;
+                DELETE FROM wishlist WHERE userId = ${userId}`;
+            await prisma.$queryRaw`
+                DELETE FROM filmuser WHERE userId = ${userId}`;
+            await prisma.$queryRaw`
+                DELETE FROM user WHERE id = ${userId}`;
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
