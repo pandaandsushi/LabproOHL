@@ -175,7 +175,7 @@ class PollingService {
 
 document.addEventListener('DOMContentLoaded', () => {
     const filmUI = new FilmUI('films-container', 'pagination');
-    const userId = localStorage.getItem('id'); // Assume the user ID is stored here
+    const userId = localStorage.getItem('id');
     let filmService;
 
     const isBrowsePage = window.location.pathname.includes('/browse');
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFilms(searchQuery = '', page = 1) {
         const allFilms = await filmService.fetchFilms();
-        const filteredFilms = filmService.filterFilms(allFilms, searchQuery); // Reuse the filter method
+        const filteredFilms = filmService.filterFilms(allFilms, searchQuery);
         const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
         const filmsToShow = filteredFilms.slice((page - 1) * filmsPerPage, page * filmsPerPage);
 

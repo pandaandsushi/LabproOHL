@@ -29,7 +29,7 @@ class FilmDetailsUI {
             this.container.innerHTML = '<p>Film not found.</p>';
             return;
         }
-
+        document.getElementById('film-cover-image').src = "../"+film.coverImage;
         document.getElementById('film-title').textContent = film.title;
         document.getElementById('film-description').textContent = film.description;
         document.getElementById('film-director').textContent = `Director: ${film.director}`;

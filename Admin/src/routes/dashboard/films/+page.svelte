@@ -49,6 +49,7 @@
 	$: newMutation = createMutation({
 		mutationFn: async (data: Parameters<typeof createFilm>[0]) => {
 			uploadProgress = 0;
+			console.log('ENTERING CREATE')
 			return await createFilm(data, (progress) => {
 				if (!progress.total) return;
 				uploadProgress = Math.round((progress.loaded / progress.total) * 100);
@@ -63,6 +64,7 @@
 	$: updateMutation = createMutation({
 		mutationFn: (payload: Parameters<typeof updateFilm>[0]) => {
 			uploadProgress = 0;
+			console.log('ENTERING UPDATE')
 			return updateFilm(payload, (progress) => {
 				if (!progress.total) return;
 				uploadProgress = Math.round((progress.loaded / progress.total) * 100);
@@ -173,6 +175,9 @@
 	}
 
 	$: isSubmitting = $newMutation.isPending || $updateMutation.isPending;
+	function logImageUrl(url: string) {
+		console.log("Image URL:", url);
+	}
 </script>
 
 <div class="flex-1">
@@ -493,8 +498,8 @@
 					class="card card-compact bg-base-300 hover:shadow-2xl duration-300 group hover:scale-105"
 				>
 					<figure class="w-full aspect-[4/3] bg-black">
-						<img src={film.cover_image_url} alt={film.title} class="aspect-[4/3] object-cover" />
-					</figure>
+						<img src="../../../Frontend/public/img/Dummy1.jpg" alt={film.title} class="aspect-[4/3] object-cover" />
+					</figure>					
 					<div class="card-body">
 						<h2 class="card-title">{film.title} ({film.release_year})</h2>
 						<p class="text-xs -mt-2 font-light mb-2">
