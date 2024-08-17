@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span class="welcome_message">${username}</span>
                     <span class="username">${balance} $</span>
                 </div>
-                <img src="/img/PROFILE_ICON.png" alt="Profile Icon" class="profile_icon" id="profile-icon">
+                <img src="../public/img/PROFILE_ICON.png" alt="Profile Icon" class="profile_icon" id="profile-icon">
                 <div class="profile_menu" id="profile-menu">
                     <button id="logout-button">Logout</button>
                 </div>

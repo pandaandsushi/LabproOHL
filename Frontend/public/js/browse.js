@@ -119,7 +119,7 @@ class FilmUI {
             const filmCard = document.createElement('div');
             filmCard.classList.add('film-card');
             filmCard.innerHTML = `
-                <img src="${film.coverImage}" alt="${film.title}">
+                <img src="../public/${film.coverImage}" alt="${film.title}">
                 <h3 style="padding-top: 10px;">${film.title}</h3>
                 <p style="margin:0; padding-top:5px;">Director: ${film.director}</p>
             `;
