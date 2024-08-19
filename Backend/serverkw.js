@@ -530,6 +530,7 @@ const server = http.createServer(async (req, res) => {
     
             upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
                 const { title, description, director, release_year, genre, price, duration } = req.body;
+                const filmId = path.split('/')[2];
                 console.log("Form data received:");
                 console.log(`Title: ${title}`);
                 console.log(`Description: ${description}`);
@@ -543,9 +544,101 @@ const server = http.createServer(async (req, res) => {
                 
                 console.log("-----------------------------------")
                 try {
+                    const existingFilm = await prisma.film.findUnique({
+                        where: { id: parseInt(filmId, 10) },
+                    });
+    
+                    if (!existingFilm) {
+                        console.log("FILM NOT FOUND");
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({
+                            status: 'error',
+                            message: 'Film not found',
+                        }));
+                        return;
+                    }
+    
+                    const genresArray = Array.isArray(genre) ? genre : [genre];
+                    const genreIds = await Promise.all(
+                        genresArray.map(async (genreName) => {
+                            const existingGenre = await prisma.genre.findUnique({
+                                where: { name: genreName },
+                            });
+                            if (existingGenre) {
+                                return existingGenre.id;
+                            } else {
+                                const newGenre = await prisma.genre.create({
+                                    data: { name: genreName },
+                                });
+                                return newGenre.id;
+                            }
+                        })
+                    );
+    
+                    const updatedFilmData = {
+                        title,
+                        description,
+                        director,
+                        releaseYear: parseInt(release_year, 10),
+                        price: parseFloat(price),
+                        duration: parseInt(duration, 10),
+                        coverImage: req.files['coverImage'] ? req.files['coverImage'][0].path : existingFilm.coverImage, 
+                        video: req.files['video'] ? req.files['video'][0].path : existingFilm.video, 
+                    };
+    
+                    const updatedFilm = await prisma.film.update({
+                        where: { id: parseInt(filmId, 10) },
+                        data: updatedFilmData,
+                    });
+    
+                    await prisma.filmGenre.deleteMany({
+                        where: { filmId: updatedFilm.id },
+                    });
+    
+                    await Promise.all(
+                        genreIds.map((genreId) => {
+                            return prisma.filmGenre.create({
+                                data: {
+                                    filmId: updatedFilm.id,
+                                    genreId,
+                                },
+                            });
+                        })
+                    );
 
-                    // lnjut
-
+                    const allGenres = await prisma.genre.findMany();
+                    await Promise.all(
+                        allGenres.map(async (genre) => {
+                            const isUsed = await prisma.filmGenre.findFirst({
+                                where: { genreId: genre.id },
+                            });
+                            if (!isUsed) {
+                                await prisma.genre.delete({
+                                    where: { id: genre.id },
+                                });
+                            }
+                        })
+                    );
+    
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        status: 'success',
+                        message: 'Film updated successfully',
+                        data: {
+                            id: updatedFilm.id.toString(),
+                            title: updatedFilm.title,
+                            description: updatedFilm.description,
+                            director: updatedFilm.director,
+                            release_year: updatedFilm.releaseYear,
+                            genre: genre,
+                            price: updatedFilm.price,
+                            duration: updatedFilm.duration,
+                            video_url: updatedFilm.video,
+                            cover_image_url: updatedFilm.coverImage,
+                            created_at: updatedFilm.createdAt,
+                            updated_at: updatedFilm.updatedAt,
+                        },
+                    }));
                 } catch (error) {
                     console.error('Error creating film:', error);
                     res.writeHead(500, { 'Content-Type': 'application/json' });
