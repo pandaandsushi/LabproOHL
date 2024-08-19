@@ -161,23 +161,40 @@ const server = http.createServer(async (req, res) => {
                 console.log(`Description: ${description}`);
                 console.log(`Director: ${director}`);
                 console.log(`Release Year: ${release_year}`);
-                console.log(`Genre: ${genre}`);
                 console.log(`Price: ${price}`);
                 console.log(`Duration: ${duration}`);
-                genre.forEach((item, index) => {
-                    console.log(`Item ${index}: ${item}`);
-                });
     
                 // console.log("Files received:");
                 // console.log(req.files);
-    
+                
                 console.log("-----------------------------------")
                 try {
+                    const existingFilm = await prisma.film.findFirst({
+                        where: {
+                            title,
+                            director,
+                            releaseYear: parseInt(release_year, 10),
+                        },
+                    });
+    
+                    if (existingFilm) {
+                        console.log("FILM ALREADY EXISTS");
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({
+                            status: 'error',
+                            message: 'Film already exists',
+                        }));
+                        return;
+                    }
+                    const genresArray = Array.isArray(genre) ? genre : [genre];
+                    if (typeof genresArray === 'string') {
+                        genresArray = [genresArray];
+                    }
                     // const videoFile = req.files['video'] ? req.files['video'][0] : null;
                     // const coverImageFile = req.files['coverImage'] ? req.files['coverImage'][0] : null;
                     console.log("CREATE GENRE X FIND")
                     const genreIds = await Promise.all(
-                        genre.map(async (genreName) => {
+                        genresArray.map(async (genreName) => {
                             const existingGenre = await prisma.genre.findUnique({
                                 where: { name: genreName },
                             });
@@ -487,74 +504,58 @@ const server = http.createServer(async (req, res) => {
     }
 
     else if (method === 'PUT' && path.startsWith('/films/')) {
-        const id = path.split('/').pop();
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
     
-        const upload = multer().fields([
-            { name: 'cover_image', maxCount: 1 },
-            { name: 'video', maxCount: 1 }
-        ]);
+        if (!token) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                status: 'error',
+                message: 'Unauthorized. No token provided.',
+            }));
+            return;
+        }
     
-        upload(req, res, async (err) => {
+        jwt.verify(token, secretKey, async (err, user) => {
             if (err) {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'error', message: 'File upload error', data: null }));
+                res.writeHead(403, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    status: 'error',
+                    message: 'Invalid token',
+                }));
                 return;
             }
     
-            const { title, description, director, release_year, genre, price, duration } = req.body;
-            const cover_image = req.files['cover_image'] ? req.files['cover_image'][0] : null;
-            const video = req.files['video'] ? req.files['video'][0] : null;
+            console.log("AKAN DIMULAI UPDATE DI SERVERKW");
     
-            try {
-                const film = await prisma.$queryRaw`
-                    SELECT id FROM film WHERE id = ${Number(id)}
-                `;
+            upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
+                const { title, description, director, release_year, genre, price, duration } = req.body;
+                console.log("Form data received:");
+                console.log(`Title: ${title}`);
+                console.log(`Description: ${description}`);
+                console.log(`Director: ${director}`);
+                console.log(`Release Year: ${release_year}`);
+                console.log(`Price: ${price}`);
+                console.log(`Duration: ${duration}`);
     
-                if (film.length === 0) {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ status: 'error', message: 'Film not found', data: null }));
-                    return;
+                // console.log("Files received:");
+                // console.log(req.files);
+                
+                console.log("-----------------------------------")
+                try {
+
+                    // lnjut
+
+                } catch (error) {
+                    console.error('Error creating film:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        status: 'error',
+                        message: 'Internal server error',
+                        error: error.message,
+                    }));
                 }
-    
-                const updateFields = [];
-                if (title) updateFields.push(`title = ${title}`);
-                if (description) updateFields.push(`description = ${description}`);
-                if (director) updateFields.push(`director = ${director}`);
-                if (release_year) updateFields.push(`releaseYear = ${release_year}`);
-                if (genre) {
-                    await prisma.$queryRaw`DELETE FROM filmgenre WHERE filmId = ${Number(id)}`;
-                    const genreIds = await prisma.$queryRaw`
-                        SELECT id FROM genre WHERE name IN (${Prisma.join(genre)})
-                    `;
-                    for (const genreId of genreIds) {
-                        await prisma.$queryRaw`
-                            INSERT INTO filmgenre (filmId, genreId) VALUES (${Number(id)}, ${genreId.id})
-                        `;
-                    }
-                }
-                if (price) updateFields.push(`price = ${price}`);
-                if (duration) updateFields.push(`duration = ${duration}`);
-                if (cover_image) updateFields.push(`coverImage = ${cover_image.path}`); 
-                if (video) updateFields.push(`video = ${video.path}`); 
-    
-                if (updateFields.length > 0) {
-                    const updateQuery = `
-                        UPDATE film SET ${updateFields.join(', ')} WHERE id = ${Number(id)}
-                    `;
-                    await prisma.$queryRaw(updateQuery);
-                }
-    
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({
-                    status: 'success',
-                    message: 'Film updated successfully',
-                    data: null, 
-                }));
-            } catch (error) {
-                console.error('Error updating film:', error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'error', message: 'Internal server error', data: null }));
-            }
+            });
         });
     }
     
@@ -618,7 +619,6 @@ const server = http.createServer(async (req, res) => {
 
     else if (method === 'GET' && path.startsWith('/films/')) {
         const id = path.split('/').pop();
-    
         try {
             const film = await prisma.$queryRaw`
                 SELECT

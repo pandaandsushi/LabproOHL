@@ -16,9 +16,6 @@ export async function getFilms(q?: string) {
         const response = await client().get(`/films?${searchParams.toString()}`);
         const data = response.data;
 
-        console.log("CEK DATA FILM CONTENTS");
-        console.log(data);
-
         const parsed = FilmsResponseSchema.parse(data);
         if (parsed.status === 'error') {
 			console.log("EROR BANH")
@@ -92,7 +89,6 @@ export async function updateFilm(
 	const { id, data } = payload;
 	await new Promise((resolve) => setTimeout(resolve, 3000));
 	const formData = new FormData();
-
 	Object.entries(data).forEach(([key, value]) => {
 		if (value === null) {
 			return;
