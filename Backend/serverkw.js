@@ -158,11 +158,8 @@ const server = http.createServer(async (req, res) => {
                 const { title, description, director, release_year, genre, price, duration } = req.body;
                 console.log("Form data received:");
                 console.log(`Title: ${title}`);
-                console.log(`Description: ${description}`);
                 console.log(`Director: ${director}`);
                 console.log(`Release Year: ${release_year}`);
-                console.log(`Price: ${price}`);
-                console.log(`Duration: ${duration}`);
     
                 // console.log("Files received:");
                 // console.log(req.files);
@@ -531,13 +528,6 @@ const server = http.createServer(async (req, res) => {
             upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
                 const { title, description, director, release_year, genre, price, duration } = req.body;
                 const filmId = path.split('/')[2];
-                console.log("Form data received:");
-                console.log(`Title: ${title}`);
-                console.log(`Description: ${description}`);
-                console.log(`Director: ${director}`);
-                console.log(`Release Year: ${release_year}`);
-                console.log(`Price: ${price}`);
-                console.log(`Duration: ${duration}`);
     
                 // console.log("Files received:");
                 // console.log(req.files);
@@ -990,9 +980,7 @@ const server = http.createServer(async (req, res) => {
                 createdAt: film.createdAt,
                 updatedAt: film.updatedAt,
             }));
-    
-            // console.log("INI FORMATTED FILM", formattedFilms);
-    
+        
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(formattedFilms));
         } catch (error) {
@@ -1117,10 +1105,7 @@ const server = http.createServer(async (req, res) => {
 
                 const userRecord = user[0];
                 const filmRecord = film[0];
-                // console.log("TES BALANCE")
-                // console.log(userRecord)
-                // console.log(userRecord.balance)
-                // console.log(filmRecord.price)
+
                 if (userRecord.balance < filmRecord.price) {
                     return res.writeHead(400, { 'Content-Type': 'application/json' })
                         .end(JSON.stringify({ message: 'Not enough balance' }));
