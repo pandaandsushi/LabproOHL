@@ -129,99 +129,6 @@ const server = http.createServer(async (req, res) => {
         });
     }
     
-    // else if (method === 'POST' && path === '/films') {
-    //     const authHeader = req.headers['authorization'];
-    //     const token = authHeader && authHeader.split(' ')[1];
-    
-    //     if (!token) {
-    //         res.writeHead(401, { 'Content-Type': 'application/json' });
-    //         res.end(JSON.stringify({
-    //             status: 'error',
-    //             message: 'Unauthorized. No token provided.',
-    //         }));
-    //         return;
-    //     }
-    
-    //     jwt.verify(token, secretKey, async (err, user) => {
-    //         if (err) {
-    //             res.writeHead(403, { 'Content-Type': 'application/json' });
-    //             res.end(JSON.stringify({
-    //                 status: 'error',
-    //                 message: 'Invalid token',
-    //             }));
-    //             return;
-    //         }
-    
-    //         // Handling the multipart form-data
-    //         console.log("AKAN DIMULAI UPLOAD DI SERVERKW")
-    //         upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
-    //             const { title, description, director, release_year, genre, price, duration } = req.body;
-    //             console.log(genre)
-    //             console.log(release_year)
-    //             if (err) {
-    //                 res.writeHead(500, { 'Content-Type': 'application/json' });
-    //                 res.end(JSON.stringify({
-    //                     status: 'error',
-    //                     message: 'File upload error',
-    //                     error: err.message,
-    //                 }));
-    //                 return;
-    //             }
-    //             console.log("HABIS TERIMA DATA DR ADMIN CREATE")
-    //             const genreArray = Array.isArray(genre) ? genre : genre.split(',');
-                
-    //             console.log("AKAN MULAI CREATE")
-    //             try {
-    //                 const videoFile = req.files['video'] ? req.files['video'][0] : null;
-    //                 const coverImageFile = req.files['coverImage'] ? req.files['coverImage'][0] : null;
-    
-    //                 const newFilm = await prisma.film.create({
-    //                     data: {
-    //                         title,
-    //                         description,
-    //                         director,
-    //                         release_year: parseInt(release_year, 10),
-    //                         genre: genreArray.join(','), // Storing as a comma-separated string
-    //                         price: parseFloat(price),
-    //                         duration: parseInt(duration, 10),
-    //                         video_url: videoFile ? `/img/${videoFile.originalname}` : null,
-    //                         cover_image_url: coverImageFile ? `/img/${coverImageFile.originalname}` : null,
-    //                     },
-    //                 });
-    //                 console.log("BERHASIL BUAT NEW FILM ISI KONTEN:")
-    //                 console.log(newFilm)
-    //                 res.writeHead(201, { 'Content-Type': 'application/json' });
-    //                 res.end(JSON.stringify({
-    //                     status: 'success',
-    //                     message: 'Film created successfully',
-    //                     data: {
-    //                         id: newFilm.id.toString(),
-    //                         title: newFilm.title,
-    //                         description: newFilm.description,
-    //                         director: newFilm.director,
-    //                         release_year: newFilm.release_year,
-    //                         genre: genreArray,
-    //                         price: newFilm.price,
-    //                         duration: newFilm.duration,
-    //                         video_url: newFilm.video_url,
-    //                         cover_image_url: newFilm.cover_image_url,
-    //                         created_at: newFilm.createdAt,
-    //                         updated_at: newFilm.updatedAt,
-    //                     },
-    //                 }));
-    //             } catch (error) {
-    //                 console.error('Error creating film:', error);
-    //                 res.writeHead(500, { 'Content-Type': 'application/json' });
-    //                 res.end(JSON.stringify({
-    //                     status: 'error',
-    //                     message: 'Internal server error',
-    //                     error: error.message,
-    //                 }));
-    //             }
-    //         });
-    //     });
-    // }
-    
     else if (method === 'POST' && path === '/films') {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -245,7 +152,6 @@ const server = http.createServer(async (req, res) => {
                 return;
             }
     
-            // Handling the multipart form-data with file uploads
             console.log("AKAN DIMULAI UPLOAD DI SERVERKW");
     
             upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
@@ -258,46 +164,66 @@ const server = http.createServer(async (req, res) => {
                 console.log(`Genre: ${genre}`);
                 console.log(`Price: ${price}`);
                 console.log(`Duration: ${duration}`);
-
-                // Ensure genre is not null or undefined, then process it
-                const genreArray = genre ? genre.split(',') : [];
-                console.log("Parsed genre array:");
-                console.log(genreArray);
-                if (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({
-                        status: 'error',
-                        message: 'File upload error',
-                        error: err.message,
-                    }));
-                    return;
-                }
+                genre.forEach((item, index) => {
+                    console.log(`Item ${index}: ${item}`);
+                });
     
-                // Log the uploaded files and form data
                 // console.log("Files received:");
                 // console.log(req.files);
     
-    
+                console.log("-----------------------------------")
                 try {
-                    // Save the film data to the database
                     // const videoFile = req.files['video'] ? req.files['video'][0] : null;
                     // const coverImageFile = req.files['coverImage'] ? req.files['coverImage'][0] : null;
-                    console.log("AKAN MELAKUKAN CREATE FILM DI DATABASE")
+                    console.log("CREATE GENRE X FIND")
+                    const genreIds = await Promise.all(
+                        genre.map(async (genreName) => {
+                            const existingGenre = await prisma.genre.findUnique({
+                                where: { name: genreName },
+                            });
+                            if (existingGenre) {
+                                console.log("SUDAH EXIST UTK GENRE: " +{genreName})
+                                return existingGenre.id;
+                            } else {
+                                const newGenre = await prisma.genre.create({
+                                    data: { name: genreName },
+                                });
+                                console.log("BELUM ADA GENRE: " +{genreName})
+                                return newGenre.id;
+                            }
+                        })
+                    );
+
+                    // Create newfilm
+                    console.log("CREATE NEWFILM")
                     const newFilm = await prisma.film.create({
                         data: {
                             title,
                             description,
                             director,
-                            release_year: parseInt(release_year, 10),
-                            genre: genreArray.join(','), // Storing as a comma-separated string
+                            releaseYear: parseInt(release_year, 10),
                             price: parseFloat(price),
                             duration: parseInt(duration, 10),
-                            video_url: videoFile ? `/img/${videoFile.originalname}` : null,
-                            cover_image_url: coverImageFile ? `/img/${coverImageFile.originalname}` : null,
+                            coverImage: null,  
+                            video: null,        
                         },
                     });
+
+                    // Create FilmGenre
+                    console.log("CREATE FILMGENRE REL")
+                    await Promise.all(
+                        genreIds.map((genreId) => {
+                            return prisma.filmGenre.create({
+                                data: {
+                                    filmId: newFilm.id,
+                                    genreId,
+                                },
+                            });
+                        })
+                    );
+
     
-                    console.log("Film successfully created:");
+                    console.log("newFilm object successfully created:");
                     console.log(newFilm);
     
                     res.writeHead(201, { 'Content-Type': 'application/json' });
@@ -310,7 +236,7 @@ const server = http.createServer(async (req, res) => {
                             description: newFilm.description,
                             director: newFilm.director,
                             release_year: newFilm.release_year,
-                            genre: genreArray,
+                            genre: genre,
                             price: newFilm.price,
                             duration: newFilm.duration,
                             video_url: newFilm.video_url,
@@ -563,7 +489,6 @@ const server = http.createServer(async (req, res) => {
     else if (method === 'PUT' && path.startsWith('/films/')) {
         const id = path.split('/').pop();
     
-        // Use Multer to handle multipart/form-data
         const upload = multer().fields([
             { name: 'cover_image', maxCount: 1 },
             { name: 'video', maxCount: 1 }
@@ -591,14 +516,12 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
     
-                // Build the update query dynamically
                 const updateFields = [];
                 if (title) updateFields.push(`title = ${title}`);
                 if (description) updateFields.push(`description = ${description}`);
                 if (director) updateFields.push(`director = ${director}`);
                 if (release_year) updateFields.push(`releaseYear = ${release_year}`);
                 if (genre) {
-                    // You might need to update the film-genre relationship here as well
                     await prisma.$queryRaw`DELETE FROM filmgenre WHERE filmId = ${Number(id)}`;
                     const genreIds = await prisma.$queryRaw`
                         SELECT id FROM genre WHERE name IN (${Prisma.join(genre)})
@@ -611,8 +534,8 @@ const server = http.createServer(async (req, res) => {
                 }
                 if (price) updateFields.push(`price = ${price}`);
                 if (duration) updateFields.push(`duration = ${duration}`);
-                if (cover_image) updateFields.push(`coverImage = ${cover_image.path}`); // You may need to save the file path
-                if (video) updateFields.push(`video = ${video.path}`); // You may need to save the file path
+                if (cover_image) updateFields.push(`coverImage = ${cover_image.path}`); 
+                if (video) updateFields.push(`video = ${video.path}`); 
     
                 if (updateFields.length > 0) {
                     const updateQuery = `
@@ -625,7 +548,7 @@ const server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({
                     status: 'success',
                     message: 'Film updated successfully',
-                    data: null, // Optionally, you can return the updated film data here
+                    data: null, 
                 }));
             } catch (error) {
                 console.error('Error updating film:', error);
