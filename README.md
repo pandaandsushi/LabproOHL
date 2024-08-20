@@ -1,5 +1,6 @@
 #  OHLLabpro - NELFLIX
 ### Thea Josephine - 13522012
+Admin FE taken from `https://github.com/arsaizdihar/labpro-ohl-fe`
 
 ## Table of Contents 💫
 * [Design Pattern](#design-pattern)

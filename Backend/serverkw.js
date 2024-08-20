@@ -1,21 +1,24 @@
 const http = require('http');
 const url = require('url');
-const multer = require('multer');
+// const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const secretKey = 'your_secret_key';
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../Frontend/public/img'));
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); 
-    },
-});
 
-const upload = multer({ storage });
+const PORT = process.env.PORT || 3001;
+
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, path.join(__dirname, '../Frontend/public/img'));
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, file.originalname); 
+//     },
+// });
+
+// const upload = multer({ storage });
 
 
 const server = http.createServer(async (req, res) => {
@@ -1209,6 +1212,7 @@ const server = http.createServer(async (req, res) => {
 
 });
 
-server.listen(3001, () => {
-    console.log('HTTPS Server is listening on port 3001');
-});
+
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });

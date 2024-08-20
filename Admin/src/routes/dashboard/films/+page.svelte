@@ -498,7 +498,7 @@
 					class="card card-compact bg-base-300 hover:shadow-2xl duration-300 group hover:scale-105"
 				>
 					<figure class="w-full aspect-[4/3] bg-black">
-						<img src="/img/Dummy1.jpg" alt={film.title} class="aspect-[4/3] object-cover" />
+						<img src={film.cover_image_url} alt={film.title} class="aspect-[4/3] object-cover" />
 					</figure>					
 					<div class="card-body">
 						<h2 class="card-title">{film.title} ({film.release_year})</h2>
