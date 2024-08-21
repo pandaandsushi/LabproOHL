@@ -2,6 +2,8 @@
 ### Thea Josephine - 13522012
 Admin FE taken from `https://github.com/arsaizdihar/labpro-ohl-fe` Cool!
 
+! Newly made film's title, director, and release year must be different than other films in the db
+
 ## Table of Contents 💫
 * [Design Pattern](#design-pattern)
 * [Servers](#servers)
@@ -31,7 +33,7 @@ The Observer Pattern enables real-time updates to the website based on backend c
 ## Bonuses
 - Responsive UI
 - Wishlist
-- 
+- Polling (not working tho TvT)
 
 ## Tools and Libraries
 - MariaDB

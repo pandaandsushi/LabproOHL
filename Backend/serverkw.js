@@ -1,5 +1,7 @@
 const http = require('http');
 const url = require('url');
+const path = require('path');
+
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -11,10 +13,16 @@ const PORT = process.env.PORT || 3001;
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../Frontend/public/img'));
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, path.join(__dirname, '../Frontend/public/img'));
+        } else if (file.mimetype === 'video/mp4') {
+            cb(null, path.join(__dirname, '../Frontend/public/vids'));
+        } else {
+            cb(new Error('Invalid file type'), null);
+        }
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname); 
+        cb(null, file.originalname.replace(/\s+/g, '_'));
     },
 });
 
@@ -135,7 +143,6 @@ const server = http.createServer(async (req, res) => {
     else if (method === 'POST' && path === '/films') {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
-    
         if (!token) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
@@ -157,15 +164,18 @@ const server = http.createServer(async (req, res) => {
     
             console.log("AKAN DIMULAI UPLOAD DI SERVERKW");
     
-            upload.fields([{ name: 'video' }, { name: 'coverImage', maxCount: 1 }])(req, res, async function (err) {
+            upload.fields([{ name: 'video' }, { name: 'cover_image', maxCount: 1 }])(req, res, async function (err) {
                 const { title, description, director, release_year, genre, price, duration } = req.body;
+                const videoFile = req.files['video'] ? req.files['video'][0] : null;
+                const coverImageFile = req.files['cover_image'] ? req.files['cover_image'][0] : null;
+
                 console.log("Form data received:");
                 console.log(`Title: ${title}`);
                 console.log(`Director: ${director}`);
                 console.log(`Release Year: ${release_year}`);
     
-                // console.log("Files received:");
-                // console.log(req.files);
+                console.log(">>>>>>> Files received:");
+                console.log(coverImageFile);
                 
                 console.log("-----------------------------------")
                 try {
@@ -190,29 +200,39 @@ const server = http.createServer(async (req, res) => {
                     if (typeof genresArray === 'string') {
                         genresArray = [genresArray];
                     }
-                    // const videoFile = req.files['video'] ? req.files['video'][0] : null;
-                    // const coverImageFile = req.files['coverImage'] ? req.files['coverImage'][0] : null;
-                    console.log("CREATE GENRE X FIND")
+                    
+                    // console.log("CREATE GENRE X FIND")
                     const genreIds = await Promise.all(
                         genresArray.map(async (genreName) => {
                             const existingGenre = await prisma.genre.findUnique({
                                 where: { name: genreName },
                             });
                             if (existingGenre) {
-                                console.log("SUDAH EXIST UTK GENRE: " +{genreName})
+                                // console.log("SUDAH EXIST UTK GENRE: " +{genreName})
                                 return existingGenre.id;
                             } else {
                                 const newGenre = await prisma.genre.create({
                                     data: { name: genreName },
                                 });
-                                console.log("BELUM ADA GENRE: " +{genreName})
+                                // console.log("BELUM ADA GENRE: " +{genreName})
                                 return newGenre.id;
                             }
                         })
                     );
 
+
+                    let coverImagePath = null;
+                    let videoPath = null;
+
+                    if (coverImageFile) {
+                        coverImagePath = `img/${coverImageFile.originalname.replace(/\s+/g, '_')}`;
+                    }
+
+                    if (videoFile) {
+                        videoPath = `vids/${videoFile.originalname.replace(/\s+/g, '_')}`;
+                    }
+                    
                     // Create newfilm
-                    console.log("CREATE NEWFILM")
                     const newFilm = await prisma.film.create({
                         data: {
                             title,
@@ -221,8 +241,8 @@ const server = http.createServer(async (req, res) => {
                             releaseYear: parseInt(release_year, 10),
                             price: parseFloat(price),
                             duration: parseInt(duration, 10),
-                            coverImage: null,  
-                            video: null,        
+                            coverImage: coverImagePath,  
+                            video: videoPath,        
                         },
                     });
 
@@ -240,8 +260,8 @@ const server = http.createServer(async (req, res) => {
                     );
 
     
-                    console.log("newFilm object successfully created:");
-                    console.log(newFilm);
+                    // console.log("newFilm object successfully created:");
+                    // console.log(newFilm);
     
                     res.writeHead(201, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
@@ -252,12 +272,12 @@ const server = http.createServer(async (req, res) => {
                             title: newFilm.title,
                             description: newFilm.description,
                             director: newFilm.director,
-                            release_year: newFilm.release_year,
+                            release_year: newFilm.releaseYear,
                             genre: genre,
                             price: newFilm.price,
                             duration: newFilm.duration,
-                            video_url: newFilm.video_url,
-                            cover_image_url: newFilm.cover_image_url,
+                            video_url: newFilm.video,
+                            cover_image_url: newFilm.coverImage,
                             created_at: newFilm.createdAt,
                             updated_at: newFilm.updatedAt,
                         },
@@ -801,8 +821,8 @@ const server = http.createServer(async (req, res) => {
                     f.id = ${id}
                 GROUP BY f.id
             `;
-            console.log("MAU DELETE FILM INI NIH")
-            console.log(filmToDelete)
+            // console.log("MAU DELETE FILM INI NIH")
+            // console.log(filmToDelete)
             if (!filmToDelete.length) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
@@ -967,7 +987,7 @@ const server = http.createServer(async (req, res) => {
                 },
             });
     
-            console.log("INI FILM BANYAKK", films);
+            // console.log("INI FILM BANYAKK", films);
     
             const formattedFilms = films.map(film => ({
                 id: film.id,

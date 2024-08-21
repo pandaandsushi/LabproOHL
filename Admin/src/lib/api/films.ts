@@ -25,7 +25,7 @@ export async function getFilms(q?: string) {
         return parsed.data;
     } catch (error) {
         console.error("Failed to fetch or parse films data:", error);
-        throw error; // Re-throw the error so it can be handled by the caller
+        throw error; 
     }
 }
 
@@ -45,8 +45,6 @@ export async function createFilm(
 ) {
 	await new Promise((resolve) => setTimeout(resolve, 3000));
 	const formData = new FormData();
-	console.log("CEK YANG DIMASUKKAN DI CREATE")
-	console.log(data);
 	Object.entries(data).forEach(([key, value]) => {
 		if (Array.isArray(value)) {
 			value.forEach((v) => formData.append(key, v));
@@ -57,7 +55,6 @@ export async function createFilm(
 		}
 	});
 	
-	console.log(formData)
 	return client()
 		.post('/films', formData, {
 			headers: {
@@ -118,8 +115,7 @@ export async function getFilm(id: string) {
 	const data = await client()
 		.get(`/films/${id}`)
 		.then((res) => res.data);
-	console.log("INI DI GETFILM")
-	console.log(data)
+
 	const parsed = FilmResponseSchema.parse(data);
 
 	if (parsed.status === 'error') {

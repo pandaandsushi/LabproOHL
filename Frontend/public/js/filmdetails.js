@@ -56,7 +56,7 @@ class FilmDetailsUI {
         if (film.isPurchased) {
             purchaseButton.textContent = 'Watch';
             purchaseButton.onclick = () => {
-                alert('Watching the film!');
+                alert('Watching the film at URL: ' + film.video);
             };
         } else {
             purchaseButton.textContent = 'Purchase';
