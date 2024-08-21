@@ -1,6 +1,6 @@
 const http = require('http');
 const url = require('url');
-// const multer = require('multer');
+const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
@@ -9,16 +9,16 @@ const secretKey = 'your_secret_key';
 
 const PORT = process.env.PORT || 3001;
 
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, path.join(__dirname, '../Frontend/public/img'));
-//     },
-//     filename: (req, file, cb) => {
-//         cb(null, file.originalname); 
-//     },
-// });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../Frontend/public/img'));
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname); 
+    },
+});
 
-// const upload = multer({ storage });
+const upload = multer({ storage });
 
 
 const server = http.createServer(async (req, res) => {

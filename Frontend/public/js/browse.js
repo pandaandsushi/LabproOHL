@@ -38,7 +38,6 @@ class BrowseFilmStrategy extends FilmFetchingStrategy {
         try {
             const response = await fetch(this.apiUrl);
             const filmsData = await response.json();
-            console.log("Fetched films data:", filmsData);
             return filmsData.map(filmData => new Film(
                 filmData.id,
                 filmData.title,
@@ -146,11 +145,34 @@ class FilmUI {
 }
 
 
-class PollingService {
-    constructor(apiUrl, onNewFilms) {
+class Observer {
+    update(data) {
+    }
+}
+
+class ObserverController {
+    constructor() {
+        this.observers = [];
+    }
+
+    addObserver(observer) {
+        this.observers.push(observer);
+    }
+
+    removeObserver(observer) {
+        this.observers = this.observers.filter(obs => obs !== observer);
+    }
+
+    notifyObservers(data) {
+        this.observers.forEach(observer => observer.update(data));
+    }
+}
+
+class Polling extends ObserverController {
+    constructor(apiUrl) {
+        super();
         this.apiUrl = apiUrl;
         this.latestFilmTimestamp = 0;
-        this.onNewFilms = onNewFilms;
     }
 
     startPolling() {
@@ -159,17 +181,39 @@ class PollingService {
 
     async longPoll() {
         try {
-            const response = await fetch(`${this.apiUrl}?since=${this.latestFilmTimestamp}`);
+            const response = await fetch (this.apiUrl);
             const data = await response.json();
             if (data.newFilms.length > 0) {
                 this.latestFilmTimestamp = data.newFilms[data.newFilms.length - 1].timestamp;
-                this.onNewFilms();
+                this.notifyObservers(data.newFilms);
             }
             this.longPoll();
         } catch (error) {
             console.error('Error in polling, resetting:', error);
             setTimeout(() => this.longPoll(), 5000);
         }
+    }
+}
+
+
+class ReloadObserver extends Observer {
+    constructor(filmUI, filmService, searchQuery, page) {
+        super();
+        this.filmUI = filmUI;
+        this.filmService = filmService;
+        this.searchQuery = searchQuery;
+        this.page = page;
+    }
+
+    async update(newFilms) {
+        console.log("MASUK UPDATE")
+        const allFilms = await this.filmService.fetchFilms();
+        const filteredFilms = this.filmService.filterFilms(allFilms, this.searchQuery);
+        const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
+        const filmsToShow = filteredFilms.slice((this.page - 1) * filmsPerPage, this.page * filmsPerPage);
+
+        this.filmUI.displayFilms(filmsToShow);
+        this.filmUI.displayPagination(totalPages, this.page, (page) => this.loadFilms(this.searchQuery, page));
     }
 }
 
@@ -198,16 +242,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredFilms = filmService.filterFilms(allFilms, searchQuery);
         const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
         const filmsToShow = filteredFilms.slice((page - 1) * filmsPerPage, page * filmsPerPage);
-
         filmUI.displayFilms(filmsToShow);
         filmUI.displayPagination(totalPages, page, (page) => loadFilms(searchQuery, page));
     }
+
+    const filmReloadObserver = new ReloadObserver(filmUI, filmService,'', currentPage);
+    const pollingService = new Polling('http://localhost:3001/api/films');
+    pollingService.addObserver(filmReloadObserver);
+    pollingService.startPolling();
+    loadFilms();
 
     document.getElementById('search-box').addEventListener('input', () => {
         const searchQuery = document.getElementById('search-box').value;
         loadFilms(searchQuery, 1);
     });
-
-    loadFilms();
 });
-

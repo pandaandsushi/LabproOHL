@@ -52,8 +52,12 @@ Manually
 
 Dockerize
 1. Make sure Docker Desktop is installed on your system
-2. Run `docker compose build` then `docker compose run` in the root directory
+2. Run each of the dockerfile in Backend and Frontend folder by typing in `docker build -t frontend .` and `docker build -t backend .`
+3. Check the docker images you created using `docker images`
+3. Run the containers by `docker run -p 3000:8080 {IMAGE ID FROM DOCKER IMAGES}` for frontend and `docker run -p 3001:8081 {IMAGE ID FROM DOCKER IMAGES}` for backend.
+(I'm having trouble with bcrypt dlopen in docker compose so we use separate docker build instead :<)
 3. Run Seeders for faster testing by navigating to Backend/scripts folder and use `node seeders.js` to populate the db with dummy datas.
+4. Open up http://localhost:3000/
 
 ### Thanks for trying my website :> 
-Kind of new to backend devs lol kind of wacky, it's my first full stack project, enjoy!
+Kind of new to backend devs lol kind of wacky, it's my first full project, enjoy!
