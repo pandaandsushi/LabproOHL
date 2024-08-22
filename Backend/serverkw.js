@@ -101,10 +101,6 @@ const server = http.createServer(async (req, res) => {
                     select: {
                         id: true,
                         username: true,
-                        email: true,
-                        isAdmin: true,
-                        balance: true,
-                        films: true,
                     }
                 });
     
@@ -699,7 +695,7 @@ const server = http.createServer(async (req, res) => {
                 release_year: film.release_year,
                 price: film.price,
                 duration: film.duration,
-                cover_image_url: film.cover_image_url,
+                cover_image_url: "http://localhost:3000/public/"+film.cover_image_url,
                 created_at: new Date(film.created_at).toISOString(),
                 updated_at: new Date(film.updated_at).toISOString(),
                 genre: film.genres ? film.genres.split(',') : []
@@ -771,7 +767,7 @@ const server = http.createServer(async (req, res) => {
                 price: filmData.price,
                 duration: filmData.duration,
                 video_url: filmData.video_url,
-                cover_image_url: filmData.cover_image_url,
+                cover_image_url: "http://localhost:3000/public/"+filmData.cover_image_url,
                 created_at: new Date(filmData.created_at).toISOString(),
                 updated_at: new Date(filmData.updated_at).toISOString(),
             };
@@ -882,7 +878,7 @@ const server = http.createServer(async (req, res) => {
 
         req.on('end', async () => {
             const { email, username, password, firstName, lastName } = JSON.parse(body);
-            console.log('Received data:', { email, username, password, firstName, lastName });
+            // console.log('Received data:', { email, username, password, firstName, lastName });
 
             try {
                 const existingUser = await prisma.user.findFirst({

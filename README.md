@@ -11,7 +11,6 @@ Admin FE taken from `https://github.com/arsaizdihar/labpro-ohl-fe` Cool!
 * [Bonuses](#bonuses)
 * [Tools](#tools-and-libraries)
 * [Setup](#setup)
-* [How To Use](#how-to-use)
 
 ## Design Pattern
 - Singleton Pattern
@@ -28,7 +27,18 @@ The Observer Pattern enables real-time updates to the website based on backend c
 - Localhost 3001 for backend server
 - Localhost 5173 for admin http://localhost:5173/
 
-## Endpoints
+## Endpoints FE Monolith
+- POST api/register
+- POST api/login
+- GET api/films + /id?
+- GET api/users + /id?
+- POST api/purchasestatus (skema purchase)
+- GET api/purchase (ini dapatkan list film yang dibeli)
+- POST api/wishliststatus (skema wishlist)
+- GET api/wishlist
+
+## Endpoints Admin
+sesuai spek.
 
 ## Bonuses
 - Responsive UI
@@ -36,10 +46,12 @@ The Observer Pattern enables real-time updates to the website based on backend c
 - Polling (not working tho TvT)
 
 ## Tools and Libraries
-- MariaDB
+- MariaDB 11.x
 - Docker Desktop
-- Node.js
-- Prisma
+- Node.js 20.x
+- Prisma ^5.x
+- bcrypt ^5.x
+- multer ^1.4.x
 - etc.
 
 ## Setup
@@ -56,10 +68,11 @@ Dockerize
 1. Make sure Docker Desktop is installed on your system
 2. Run each of the dockerfile in Backend and Frontend folder by typing in `docker build -t frontend .` and `docker build -t backend .`
 3. Check the docker images you created using `docker images`
-3. Run the containers by `docker run -p 3000:8080 {IMAGE ID FROM DOCKER IMAGES}` for frontend and `docker run -p 3001:8081 {IMAGE ID FROM DOCKER IMAGES}` for backend.
+4. Run the containers by `docker run -p 3000:8080 {IMAGE ID FROM DOCKER IMAGES}` for frontend and `docker run -p 3001:8081 {IMAGE ID FROM DOCKER IMAGES}` for backend.
+5. Run Seeders for faster testing by navigating to Backend/scripts folder and use `node seeders.js` to populate the db with dummy datas.
+6. Open up http://localhost:3000/
+
 (I'm having trouble with bcrypt dlopen in docker compose so we use separate docker build instead :<)
-3. Run Seeders for faster testing by navigating to Backend/scripts folder and use `node seeders.js` to populate the db with dummy datas.
-4. Open up http://localhost:3000/
 
 ### Thanks for trying my website :> 
-Kind of new to backend devs lol kind of wacky, it's my first full project, enjoy!
+Kind of new to backend devs lol abit wacky, it's my first full project, enjoy!
